@@ -42,7 +42,9 @@ export async function POST(req: Request) {
     });
 
     return response;
-  } catch {
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  } catch (error) {
+    console.error("Login error:", error);
+    const message = error instanceof Error ? error.message : "Server error";
+    return NextResponse.json({ message, error: String(error) }, { status: 500 });
   }
 }

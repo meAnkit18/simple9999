@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 export default function LoginPage() {
     const [form, setForm] = useState({ email: "", password: "" });
@@ -55,7 +56,7 @@ export default function LoginPage() {
                         <input
                             type="email"
                             placeholder="Enter your email"
-                            className="border p-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-black"
+                            className="border p-3 w-full text-black rounded focus:outline-none focus:ring-2 focus:ring-black"
                             value={form.email}
                             onChange={(e) => setForm({ ...form, email: e.target.value })}
                             required
@@ -69,7 +70,7 @@ export default function LoginPage() {
                         <input
                             type="password"
                             placeholder="Enter your password"
-                            className="border p-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-black"
+                            className="border p-3 w-full text-black rounded focus:outline-none focus:ring-2 focus:ring-black"
                             value={form.password}
                             onChange={(e) => setForm({ ...form, password: e.target.value })}
                             required

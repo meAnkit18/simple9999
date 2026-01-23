@@ -2,47 +2,68 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/Sidebar";
 
 export default function Dashboard() {
-    const router = useRouter();
-    const [loggingOut, setLoggingOut] = useState(false);
+  const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
 
-    async function handleLogout() {
-        setLoggingOut(true);
-        try {
-            await fetch("/api/auth/logout", {
-                method: "POST",
-            });
-            router.push("/login");
-        } catch (error) {
-            console.error("Logout failed:", error);
-            setLoggingOut(false);
-        }
+  const uploadFile = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const fd = new FormData();
+    fd.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: fd,
+      });
+
+      const data = await res.json();
+      console.log("Upload success:", data);
+      alert("File uploaded successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed");
     }
+  };
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <nav className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                    <h1 className="text-xl font-bold">Dashboard</h1>
-                    <button
-                        onClick={handleLogout}
-                        disabled={loggingOut}
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50 transition-colors"
-                    >
-                        {loggingOut ? "Logging out..." : "Logout"}
-                    </button>
-                </div>
-            </nav>
+  async function handleLogout() {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      setLoggingOut(false);
+    }
+  }
 
-            <main className="max-w-7xl mx-auto px-4 py-8">
-                <div className="bg-white rounded-lg shadow-md p-6">
-                    <h2 className="text-2xl font-bold mb-4">Welcome to your Dashboard!</h2>
-                    <p className="text-black-600">
-                        You have successfully logged in. This is a protected page that only authenticated users can access.
-                    </p>
-                </div>
-            </main>
+  return (
+    <div className="min-h-screen flex bg-gray-50">
+      <Sidebar />
+
+      <div className="flex-1">
+        <Navbar />
+
+        <div className="p-6">
+          <label className="block mb-2 font-semibold  text-black">
+            Upload document
+          </label>
+
+          <input
+            type="file"
+            onChange={uploadFile}
+            className="block w-full border rounded p-2 text-black"
+            accept=".pdf"
+          />
         </div>
-    );
+      </div>
+    </div>
+  );
 }
