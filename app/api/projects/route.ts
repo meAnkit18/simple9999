@@ -23,11 +23,12 @@ async function getUserFromToken() {
 
 // GET - Fetch all projects for user
 export async function GET() {
-    const userId = await getUserFromToken();
+   const userId = (await getUserFromToken()) || process.env.DEV_USER_ID;
 
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+if (!userId) {
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+}
+
 
     try {
         await connectDB();
