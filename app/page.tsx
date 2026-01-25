@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Bu from "@/components/Test"
 
 export default function Home() {
   return (
@@ -64,7 +63,6 @@ export default function Home() {
             <p className="text-gray-400">
               Generate tailored resumes for specific companies and roles.
             </p>
-            <Bu />
           </div>
         </div>
       </section>

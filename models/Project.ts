@@ -6,24 +6,35 @@ const ProjectSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  originalPrompt: {
+  name: {
     type: String,
-    required: true,
+    default: "Untitled Resume",
+  },
+  latexCode: {
+    type: String,
+    default: "",
+  },
+  previewHtml: {
+    type: String,
+    default: "",
+  },
+  chatHistory: {
+    type: [
+      {
+        role: String,
+        content: String,
+      },
+    ],
+    default: [],
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
-  chatHistory: {
-  type: [
-    {
-      role: String,
-      content: String,
-    },
-  ],
-  default: [],
-},
-
+  lastModified: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export default mongoose.models.Project ||

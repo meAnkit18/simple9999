@@ -26,6 +26,6 @@ export interface Project {
 }
 
 export enum ModelType {
-    CODING = "gemini-2.0-flash",
-    FAST = "gemini-2.0-flash",
+    CODING = "llama-3.3-70b-versatile",
+    FAST = "llama-3.3-70b-versatile",
 }
