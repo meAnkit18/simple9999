@@ -1,87 +1,60 @@
-import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
+import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import User from "@/models/User";
+import { getUserFromToken } from "@/lib/auth";
+import { extractUserProfile } from "@/lib/user-profile";
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "your-secret-key");
-
-async function getUserFromToken() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("token")?.value;
-
-    if (!token) return null;
-
-    try {
-        const { payload } = await jwtVerify(token, JWT_SECRET);
-        return payload.userId as string;
-    } catch {
-        return null;
-    }
-}
-
-// GET - Fetch user profile
 export async function GET() {
-    const userId = await getUserFromToken();
-
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     try {
         await connectDB();
-        const user = await User.findById(userId).select("-password");
 
-        if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        const userId = await getUserFromToken();
+        if (!userId) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        return NextResponse.json({
-            user: {
-                id: user._id.toString(),
-                name: user.name,
-                email: user.email,
-                profileData: user.profileData || "",
-            }
-        });
-    } catch (error) {
-        console.error("Fetch profile error:", error);
-        return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 });
-    }
-}
+        console.log("[Profile API] Extracting profile for user:", userId);
 
-// PUT - Update user profile data
-export async function PUT(request: NextRequest) {
-    const userId = await getUserFromToken();
+        const profile = await extractUserProfile(userId);
 
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    try {
-        await connectDB();
-        const { profileData } = await request.json();
-
-        const user = await User.findByIdAndUpdate(
-            userId,
-            { profileData },
-            { new: true }
-        ).select("-password");
-
-        if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        if (!profile) {
+            return NextResponse.json({
+                hasProfile: false,
+                message: "No documents uploaded yet. Upload your LinkedIn PDF, certificates, or resume to build your profile.",
+            });
         }
 
+        // Check if we have meaningful data
+        const hasData = !!(
+            profile.fullName ||
+            profile.skills?.length > 0 ||
+            profile.experience?.length > 0 ||
+            profile.education?.length > 0
+        );
+
         return NextResponse.json({
-            user: {
-                id: user._id.toString(),
-                name: user.name,
-                email: user.email,
-                profileData: user.profileData || "",
-            }
+            hasProfile: hasData,
+            profile: {
+                fullName: profile.fullName,
+                email: profile.email,
+                phone: profile.phone,
+                location: profile.location,
+                linkedin: profile.linkedin,
+                summary: profile.summary,
+                skillsCount: profile.skills?.length || 0,
+                experienceCount: profile.experience?.length || 0,
+                educationCount: profile.education?.length || 0,
+                certificationsCount: profile.certifications?.length || 0,
+                projectsCount: profile.projects?.length || 0,
+                skills: profile.skills || [],
+                experience: profile.experience || [],
+                education: profile.education || [],
+            },
         });
     } catch (error) {
-        console.error("Update profile error:", error);
-        return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
+        console.error("Profile API error:", error);
+        return NextResponse.json(
+            { error: "Failed to extract profile" },
+            { status: 500 }
+        );
     }
 }
