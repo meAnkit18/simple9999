@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 export default function EditorPage() {
@@ -21,6 +21,41 @@ export default function EditorPage() {
     { role: string; content: string }[]
   >([]);
 
+  // Refs for debouncing and tracking latest values
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const latestLatexRef = useRef(latex);
+  const isInitialLoadRef = useRef(true);
+
+  // Keep the ref in sync with state
+  useEffect(() => {
+    latestLatexRef.current = latex;
+  }, [latex]);
+
+  // Generate preview function (memoized)
+  const generatePreview = useCallback(async (latexCode?: string) => {
+    const codeToUse = latexCode || latestLatexRef.current;
+    if (!codeToUse.trim()) return;
+
+    setPreviewLoading(true);
+    try {
+      const res = await fetch("/api/preview", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId, latexCode: codeToUse }),
+      });
+
+      const data = await res.json();
+      if (data.html) {
+        setPreviewHtml(data.html);
+      }
+    } catch (err) {
+      console.error("Preview failed", err);
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, [projectId]);
+
   // Load project
   useEffect(() => {
     async function loadProject() {
@@ -34,16 +69,45 @@ export default function EditorPage() {
           setPreviewHtml(project.previewHtml || "");
           setProjectName(project.name || "");
           setChatHistory(project.chatHistory || []);
+
+          // Auto-generate preview on load if we have LaTeX but no preview
+          if (project.latexCode && !project.previewHtml) {
+            setTimeout(() => generatePreview(project.latexCode), 500);
+          }
         }
       } catch (err) {
         console.error("Failed to load project", err);
       } finally {
         setLoading(false);
+        isInitialLoadRef.current = false;
       }
     }
 
     loadProject();
-  }, [projectId]);
+  }, [projectId, generatePreview]);
+
+  // Auto-regenerate preview when LaTeX changes (debounced)
+  useEffect(() => {
+    // Skip on initial load
+    if (isInitialLoadRef.current || !latex.trim()) return;
+
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Set new debounce timer (1.5 seconds after user stops typing)
+    debounceTimerRef.current = setTimeout(() => {
+      generatePreview(latex);
+    }, 1500);
+
+    // Cleanup on unmount or before next effect run
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [latex, generatePreview]);
 
   // Save LaTeX
   async function saveLatex() {
@@ -96,27 +160,6 @@ export default function EditorPage() {
     }
   }
 
-  // Generate preview
-  async function generatePreview() {
-    setPreviewLoading(true);
-    try {
-      const res = await fetch("/api/preview", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId }),
-      });
-
-      const data = await res.json();
-      if (data.html) {
-        setPreviewHtml(data.html);
-      }
-    } catch (err) {
-      console.error("Preview failed", err);
-    } finally {
-      setPreviewLoading(false);
-    }
-  }
 
   if (loading) {
     return (
@@ -141,7 +184,7 @@ export default function EditorPage() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={generatePreview}
+            onClick={() => generatePreview()}
             disabled={previewLoading}
             className="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-sm"
           >
@@ -169,8 +212,8 @@ export default function EditorPage() {
               <div
                 key={i}
                 className={`p-2 rounded text-sm ${msg.role === "user"
-                    ? "bg-blue-900 ml-4"
-                    : "bg-gray-800 mr-4"
+                  ? "bg-blue-900 ml-4"
+                  : "bg-gray-800 mr-4"
                   }`}
               >
                 {msg.content}
@@ -215,10 +258,22 @@ export default function EditorPage() {
 
         {/* Right: Preview */}
         <div className="w-[35%] flex flex-col">
-          <div className="p-3 border-b border-gray-700">
+          <div className="p-3 border-b border-gray-700 flex items-center justify-between">
             <h2 className="font-semibold">Preview</h2>
+            {previewLoading && (
+              <span className="text-xs text-blue-400 animate-pulse">
+                Updating...
+              </span>
+            )}
           </div>
-          <div className="flex-1 overflow-auto bg-white">
+          <div className="flex-1 overflow-auto bg-white relative">
+            {previewLoading && (
+              <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-10">
+                <div className="text-white text-sm animate-pulse">
+                  Generating preview...
+                </div>
+              </div>
+            )}
             {previewHtml ? (
               <iframe
                 srcDoc={previewHtml}
@@ -227,7 +282,7 @@ export default function EditorPage() {
               />
             ) : (
               <div className="h-full flex items-center justify-center text-gray-500">
-                Click "Preview" to generate
+                {latex.trim() ? "Preview will auto-generate..." : "Enter LaTeX code to preview"}
               </div>
             )}
           </div>

@@ -13,20 +13,30 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { projectId } = await req.json();
-        if (!projectId) {
-            return NextResponse.json(
-                { error: "projectId required" },
-                { status: 400 }
-            );
+        const { projectId, latexCode: directLatex } = await req.json();
+
+        let latexToPreview = directLatex;
+        let project = null;
+
+        // If latexCode is provided directly, use it (live preview mode)
+        // Otherwise, fetch from the project (legacy mode)
+        if (!latexToPreview) {
+            if (!projectId) {
+                return NextResponse.json(
+                    { error: "projectId or latexCode required" },
+                    { status: 400 }
+                );
+            }
+
+            project = await Project.findOne({ _id: projectId, userId });
+            if (!project) {
+                return NextResponse.json({ error: "Project not found" }, { status: 404 });
+            }
+
+            latexToPreview = project.latexCode;
         }
 
-        const project = await Project.findOne({ _id: projectId, userId });
-        if (!project) {
-            return NextResponse.json({ error: "Project not found" }, { status: 404 });
-        }
-
-        if (!project.latexCode) {
+        if (!latexToPreview) {
             return NextResponse.json(
                 { error: "No LaTeX code to preview" },
                 { status: 400 }
@@ -34,12 +44,14 @@ export async function POST(req: NextRequest) {
         }
 
         // Generate HTML preview from LaTeX
-        const html = await generatePreview(project.latexCode);
+        const html = await generatePreview(latexToPreview);
 
-        // Cache the preview
-        project.previewHtml = html;
-        project.lastModified = new Date();
-        await project.save();
+        // Optionally cache the preview if we have a project
+        if (project && projectId) {
+            project.previewHtml = html;
+            project.lastModified = new Date();
+            await project.save();
+        }
 
         return NextResponse.json({ html });
     } catch (error) {
