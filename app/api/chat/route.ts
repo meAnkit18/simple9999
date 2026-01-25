@@ -23,6 +23,10 @@ export async function POST(req: NextRequest) {
     let userContext = "";
     try {
       userContext = await getUserContextFromPrompt(userId, message);
+      console.log("[Chat API] User context retrieved, length:", userContext?.length || 0);
+      if (userContext && userContext.length > 0) {
+        console.log("[Chat API] Context preview:", userContext.substring(0, 200));
+      }
     } catch (err) {
       console.warn("Context retrieval failed, proceeding without:", err);
     }

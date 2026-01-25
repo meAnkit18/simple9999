@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@huggingface/inference": "^4.13.10",
+    "@langchain/community": "^1.1.7",
     "@langchain/core": "^1.1.16",
     "@langchain/google-genai": "^2.1.12",
     "@langchain/groq": "^1.0.3",

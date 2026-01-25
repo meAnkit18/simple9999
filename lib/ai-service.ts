@@ -17,15 +17,33 @@ export async function generateResume(
     prompt: string,
     userContext: string
 ): Promise<string> {
-    const fullPrompt = `${LATEX_SYSTEM}
+    // Build a stronger prompt that forces the AI to use user's data
+    let fullPrompt = `${LATEX_SYSTEM}
 
 User Request: "${prompt}"
 
-${userContext ? `Relevant context from user's documents:\n${userContext}` : ""}
+`;
 
-Generate a complete, professional LaTeX resume based on the request.
-If context is provided, incorporate relevant experience/skills.
-Return ONLY the raw LaTeX code, no markdown blocks.`;
+    if (userContext && userContext.trim().length > 50) {
+        fullPrompt += `IMPORTANT: The following is the user's PERSONAL DATA extracted from their uploaded documents (LinkedIn PDF, certificates, etc.). 
+You MUST use this information to create THEIR resume. Extract their name, email, phone, work experience, education, skills, and achievements from this data.
+DO NOT make up fake information - use ONLY what is provided below:
+
+=== USER'S PERSONAL DATA ===
+${userContext}
+=== END OF PERSONAL DATA ===
+
+Generate a complete, professional LaTeX resume using the ACTUAL personal data above.
+If some sections are missing from their data, you can omit those sections or note them as placeholders.
+`;
+    } else {
+        fullPrompt += `Note: No personal documents were found for this user. Generate a professional template resume with placeholder content that they can edit.
+`;
+    }
+
+    fullPrompt += `Return ONLY the raw LaTeX code, no markdown blocks.`;
+
+    console.log("[AI Service] Generating resume with context length:", userContext?.length || 0);
 
     const response = await model.invoke(fullPrompt);
     let latex = response.content as string;
