@@ -3,6 +3,15 @@
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useRouter } from "next/navigation";
+import {
+  MessageSquarePlus,
+  Folder,
+  User,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  Menu
+} from "lucide-react";
 
 interface SidebarProps {
   activeTab: string;
@@ -27,9 +36,9 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarPr
   }, []);
 
   const navItems = [
-    { id: "create", label: "New Chat", icon: "✨" },
-    { id: "documents", label: "Documents", icon: "📁" },
-    { id: "profile", label: "My Profile", icon: "👤" },
+    { id: "create", label: "New Chat", icon: MessageSquarePlus },
+    { id: "documents", label: "Documents", icon: Folder },
+    { id: "profile", label: "My Profile", icon: User },
   ] as const;
 
   return (
@@ -60,7 +69,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarPr
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors"
           >
-            {isCollapsed ? "→" : "←"}
+            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </button>
         </div>
 
@@ -82,7 +91,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarPr
               `}
               title={isCollapsed ? item.label : ""}
             >
-              <span className="text-xl">{item.icon}</span>
+              <item.icon size={24} />
               {!isCollapsed && (
                 <span className="font-medium truncate">{item.label}</span>
               )}
@@ -105,7 +114,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarPr
             `}
             title="Logout"
           >
-            <span>🚪</span>
+            <LogOut size={20} />
             {!isCollapsed && <span className="font-medium">Logout</span>}
           </button>
         </div>
@@ -117,7 +126,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarPr
           onClick={() => setIsCollapsed(false)}
           className="fixed top-4 left-4 z-40 p-2 bg-card border border-border rounded-lg shadow-lg"
         >
-          ☰
+          <Menu size={24} />
         </button>
       )}
     </>

@@ -3,6 +3,21 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "@/components/Sidebar";
+import {
+  Sparkles,
+  User,
+  FileText,
+  Upload,
+  File,
+  Check,
+  Loader2,
+  Mail,
+  Phone,
+  MapPin,
+  ExternalLink,
+  AlertTriangle,
+  CheckCircle2
+} from "lucide-react";
 
 interface Project {
   id: string;
@@ -193,7 +208,7 @@ export default function Dashboard() {
                 {/* Welcome / Empty State */}
                 <div className="text-center space-y-6 mb-12 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
                   <div className="inline-block p-4 rounded-full bg-primary/5 mb-4">
-                    <span className="text-4xl">✨</span>
+                    <Sparkles className="w-10 h-10 text-primary" />
                   </div>
                   <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                     What can I help you build?
@@ -229,7 +244,7 @@ export default function Dashboard() {
                         className="absolute right-2 bottom-2 p-2 bg-primary text-primary-foreground rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                       >
                         {loading ? (
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -279,7 +294,8 @@ export default function Dashboard() {
                     <p className="text-muted-foreground mt-1">Managed by AI from your documents</p>
                   </div>
                   {hasProfile && (
-                    <span className="px-3 py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-sm font-medium border border-green-500/20">
+                    <span className="flex items-center gap-2 px-3 py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-sm font-medium border border-green-500/20">
+                      <CheckCircle2 className="w-4 h-4" />
                       Active & Ready
                     </span>
                   )}
@@ -287,12 +303,14 @@ export default function Dashboard() {
 
                 {profileLoading ? (
                   <div className="flex flex-col items-center justify-center h-64 space-y-4">
-                    <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+                    <Loader2 className="w-8 h-8 text-primary animate-spin" />
                     <p className="text-muted-foreground animate-pulse">Analyzing your digital footprint...</p>
                   </div>
                 ) : !hasProfile ? (
                   <div className="text-center py-12 bg-card border border-dashed border-border rounded-2xl">
-                    <div className="text-6xl mb-4">👤</div>
+                    <div className="inline-block p-4 bg-accent/50 rounded-full mb-4">
+                      <User className="w-12 h-12 text-muted-foreground" />
+                    </div>
                     <h3 className="text-xl font-semibold mb-2">Profile Not Found</h3>
                     <p className="text-muted-foreground max-w-md mx-auto mb-6">
                       Upload your resume or LinkedIn PDF to let the AI build your professional profile automatically.
@@ -312,9 +330,9 @@ export default function Dashboard() {
                       <div className="relative">
                         <h3 className="text-2xl font-bold">{profile?.fullName}</h3>
                         <div className="flex flex-wrap gap-4 mt-2 text-muted-foreground">
-                          {profile?.email && <span className="flex items-center gap-1">📧 {profile.email}</span>}
-                          {profile?.phone && <span className="flex items-center gap-1">📱 {profile.phone}</span>}
-                          {profile?.location && <span className="flex items-center gap-1">📍 {profile.location}</span>}
+                          {profile?.email && <span className="flex items-center gap-1"><Mail className="w-4 h-4" /> {profile.email}</span>}
+                          {profile?.phone && <span className="flex items-center gap-1"><Phone className="w-4 h-4" /> {profile.phone}</span>}
+                          {profile?.location && <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {profile.location}</span>}
                         </div>
                       </div>
                     </div>
@@ -395,13 +413,9 @@ export default function Dashboard() {
                     <div className="border-2 border-dashed border-border rounded-2xl p-12 text-center transition-all duration-300 group-hover:border-primary/50 group-hover:bg-primary/5">
                       <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                         {uploading ? (
-                          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                          <Loader2 className="w-8 h-8 text-primary animate-spin" />
                         ) : (
-                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                          </svg>
+                          <Upload className="w-8 h-8 text-primary" />
                         )}
                       </div>
                       <h3 className="text-lg font-semibold mb-2">
@@ -424,10 +438,11 @@ export default function Dashboard() {
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-red-500/10 text-red-500 rounded-lg">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                              <polyline points="14 2 14 8 20 8"></polyline>
-                            </svg>
+                            {f.type === "application/pdf" ? (
+                              <FileText className="w-6 h-6" />
+                            ) : (
+                              <File className="w-6 h-6" />
+                            )}
                           </div>
                           <div>
                             <div className="font-medium truncate max-w-[200px]" title={f.name}>{f.name}</div>
@@ -444,18 +459,18 @@ export default function Dashboard() {
                             className="p-2 text-muted-foreground hover:text-primary transition-colors"
                             title="View File"
                           >
-                            ↗
+                            <ExternalLink className="w-4 h-4" />
                           </a>
                         )}
                       </div>
                       <div className="mt-4 flex items-center gap-2 text-xs">
                         {f.chunksCount > 0 ? (
                           <span className="px-2 py-1 bg-green-500/10 text-green-600 rounded-full flex items-center gap-1">
-                            ✓ {f.chunksCount} chunks
+                            <Check className="w-3 h-3" /> {f.chunksCount} chunks
                           </span>
                         ) : (
-                          <span className="px-2 py-1 bg-yellow-500/10 text-yellow-600 rounded-full">
-                            Processing...
+                          <span className="px-2 py-1 bg-yellow-500/10 text-yellow-600 rounded-full flex items-center gap-1">
+                            <AlertTriangle className="w-3 h-3" /> Processing...
                           </span>
                         )}
                       </div>

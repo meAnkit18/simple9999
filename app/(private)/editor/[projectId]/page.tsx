@@ -200,48 +200,96 @@ export default function EditorPage() {
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Chat */}
-        <div className="w-1/3 border-r border-border flex flex-col bg-card/30">
-          <div className="p-3 border-b border-border">
-            <h2 className="font-semibold">Chat</h2>
+        <div className="w-1/3 border-r border-border flex flex-col bg-muted/10 backdrop-blur-sm">
+          <div className="p-4 border-b border-border flex items-center justify-between bg-card/50">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              </div>
+              <div>
+                <h2 className="font-semibold text-sm">AI Editor</h2>
+                <p className="text-xs text-muted-foreground">Always here to edit</p>
+              </div>
+            </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-2">
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
             {chatHistory.length === 0 && (
-              <div className="text-muted-foreground text-sm text-center py-4">
-                Ask the AI to edit your resume...
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 opacity-60">
+                <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                </div>
+                <h3 className="font-medium text-foreground mb-1">No messages yet</h3>
+                <p className="text-sm text-muted-foreground">Ask me to edit your resume, fix typos, or improve formatting.</p>
               </div>
             )}
             {chatHistory.map((msg, i) => (
               <div
                 key={i}
-                className={`p-2 rounded text-sm ${msg.role === "user"
-                  ? "bg-primary/10 text-foreground ml-4 border border-primary/20"
-                  : "bg-muted text-foreground mr-4 border border-border"
-                  }`}
+                className={`flex gap-3 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
               >
-                {msg.content}
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === "user"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted border border-border text-foreground"
+                  }`}>
+                  {msg.role === "user" ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" /><path d="m2 10 2-2" /><path d="m22 10-2-2" /><path d="m16 6-4 4-4-4" /><path d="M12 14v8" /><path d="M8 18h8" /></svg>
+                  )}
+                </div>
+                <div
+                  className={`max-w-[85%] p-3 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === "user"
+                    ? "bg-primary text-primary-foreground rounded-tr-sm"
+                    : "bg-card border border-border text-foreground rounded-tl-sm"
+                    }`}
+                >
+                  {msg.content}
+                </div>
               </div>
             ))}
+            {chatLoading && (
+              <div className="flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-muted border border-border flex items-center justify-center flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" /><path d="m2 10 2-2" /><path d="m22 10-2-2" /><path d="m16 6-4 4-4-4" /><path d="M12 14v8" /><path d="M8 18h8" /></svg>
+                </div>
+                <div className="bg-card border border-border p-4 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 bg-primary/50 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="w-1.5 h-1.5 bg-primary/50 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="w-1.5 h-1.5 bg-primary/50 rounded-full animate-bounce"></div>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="p-3 border-t border-border bg-card">
-            <textarea
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Make it more concise..."
-              className="w-full h-20 bg-background border border-input rounded p-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary transition-colors placeholder:text-muted-foreground"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendChat();
-                }
-              }}
-            />
-            <button
-              onClick={sendChat}
-              disabled={chatLoading}
-              className="mt-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 py-2 rounded text-sm font-medium transition-colors"
-            >
-              {chatLoading ? "Applying..." : "Apply Change"}
-            </button>
+
+          <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm">
+            <div className="relative flex items-end gap-2 bg-background border border-input rounded-xl p-2 shadow-sm focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+              <textarea
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Ask AI to improve your resume..."
+                className="w-full max-h-32 bg-transparent border-none p-2 text-sm resize-none focus:outline-none placeholder:text-muted-foreground/70"
+                rows={1}
+                style={{ minHeight: "44px" }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendChat();
+                  }
+                }}
+              />
+              <button
+                onClick={sendChat}
+                disabled={chatLoading || !chatInput.trim()}
+                className="mb-1 p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
+                title="Send message"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </div>
+            <p className="text-[10px] text-muted-foreground text-center mt-2">
+              AI can make mistakes. Please review the changes.
+            </p>
           </div>
         </div>
 
