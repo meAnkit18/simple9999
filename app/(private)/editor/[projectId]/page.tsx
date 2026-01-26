@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function EditorPage() {
   const { projectId } = useParams() as { projectId: string };
@@ -165,30 +166,31 @@ export default function EditorPage() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-900 text-white">
+      <div className="h-screen flex items-center justify-center bg-background text-foreground">
         Loading resume...
       </div>
     );
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900 text-white">
+    <div className="h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
       {/* Header */}
-      <header className="border-b border-gray-700 p-3 flex justify-between items-center">
+      <header className="border-b border-border p-3 flex justify-between items-center bg-card/50 backdrop-blur">
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push("/dashboard")}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             ← Back
           </button>
           <span className="font-medium truncate max-w-[200px]">{projectName}</span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <ThemeToggle />
           <button
             onClick={saveLatex}
             disabled={saveLoading}
-            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded text-sm font-medium transition-colors"
+            className="px-4 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 rounded text-sm font-medium transition-colors"
           >
             {saveLoading ? "Saving..." : "Save"}
           </button>
@@ -198,13 +200,13 @@ export default function EditorPage() {
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Chat */}
-        <div className="w-1/3 border-r border-gray-700 flex flex-col">
-          <div className="p-3 border-b border-gray-700">
+        <div className="w-1/3 border-r border-border flex flex-col bg-card/30">
+          <div className="p-3 border-b border-border">
             <h2 className="font-semibold">Chat</h2>
           </div>
           <div className="flex-1 overflow-y-auto p-3 space-y-2">
             {chatHistory.length === 0 && (
-              <div className="text-gray-500 text-sm text-center py-4">
+              <div className="text-muted-foreground text-sm text-center py-4">
                 Ask the AI to edit your resume...
               </div>
             )}
@@ -212,20 +214,20 @@ export default function EditorPage() {
               <div
                 key={i}
                 className={`p-2 rounded text-sm ${msg.role === "user"
-                  ? "bg-blue-900 ml-4"
-                  : "bg-gray-800 mr-4"
+                  ? "bg-primary/10 text-foreground ml-4 border border-primary/20"
+                  : "bg-muted text-foreground mr-4 border border-border"
                   }`}
               >
                 {msg.content}
               </div>
             ))}
           </div>
-          <div className="p-3 border-t border-gray-700">
+          <div className="p-3 border-t border-border bg-card">
             <textarea
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
               placeholder="Make it more concise..."
-              className="w-full h-20 bg-gray-800 border border-gray-600 rounded p-2 text-sm resize-none focus:outline-none focus:border-blue-500 transition-colors"
+              className="w-full h-20 bg-background border border-input rounded p-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary transition-colors placeholder:text-muted-foreground"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -236,7 +238,7 @@ export default function EditorPage() {
             <button
               onClick={sendChat}
               disabled={chatLoading}
-              className="mt-2 w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 py-2 rounded text-sm font-medium transition-colors"
+              className="mt-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 py-2 rounded text-sm font-medium transition-colors"
             >
               {chatLoading ? "Applying..." : "Apply Change"}
             </button>
@@ -244,16 +246,16 @@ export default function EditorPage() {
         </div>
 
         {/* Right: Merged LaTeX/Preview Panel */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col bg-background">
           {/* Toggle Switch Header */}
-          <div className="p-3 border-b border-gray-700 flex items-center justify-between">
+          <div className="p-3 border-b border-border flex items-center justify-between bg-card/30">
             {/* Toggle Switch */}
-            <div className="flex items-center bg-gray-800 rounded-lg p-1">
+            <div className="flex items-center bg-muted rounded-lg p-1">
               <button
                 onClick={() => setActiveView("latex")}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${activeView === "latex"
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
                   }`}
               >
                 LaTeX
@@ -261,8 +263,8 @@ export default function EditorPage() {
               <button
                 onClick={() => setActiveView("preview")}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${activeView === "preview"
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
                   }`}
               >
                 Preview
@@ -272,7 +274,7 @@ export default function EditorPage() {
             {/* Status indicators */}
             <div className="flex items-center gap-3">
               {previewLoading && (
-                <span className="text-xs text-blue-400 animate-pulse">
+                <span className="text-xs text-primary animate-pulse">
                   Updating preview...
                 </span>
               )}
@@ -280,7 +282,7 @@ export default function EditorPage() {
                 <button
                   onClick={() => generatePreview()}
                   disabled={previewLoading}
-                  className="px-3 py-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 rounded text-xs transition-colors"
+                  className="px-3 py-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground disabled:opacity-50 rounded text-xs transition-colors"
                 >
                   Refresh
                 </button>
@@ -300,7 +302,7 @@ export default function EditorPage() {
               <textarea
                 value={latex}
                 onChange={(e) => setLatex(e.target.value)}
-                className="w-full h-full bg-gray-800 p-4 font-mono text-sm resize-none focus:outline-none"
+                className="w-full h-full bg-background p-4 font-mono text-sm resize-none focus:outline-none text-foreground"
                 spellCheck={false}
                 placeholder="Enter your LaTeX code here..."
               />
@@ -315,8 +317,8 @@ export default function EditorPage() {
             >
               <div className="w-full h-full bg-white relative overflow-auto">
                 {previewLoading && (
-                  <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-10">
-                    <div className="bg-gray-800 px-4 py-2 rounded-lg text-white text-sm animate-pulse">
+                  <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-10 backdrop-blur-sm">
+                    <div className="bg-card px-4 py-2 rounded-lg text-foreground text-sm animate-pulse border border-border shadow-lg">
                       Generating preview...
                     </div>
                   </div>
@@ -328,7 +330,7 @@ export default function EditorPage() {
                     title="Resume Preview"
                   />
                 ) : (
-                  <div className="h-full flex items-center justify-center text-gray-500">
+                  <div className="h-full flex items-center justify-center text-muted-foreground">
                     {latex.trim() ? "Preview will auto-generate..." : "Enter LaTeX code to preview"}
                   </div>
                 )}

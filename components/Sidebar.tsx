@@ -13,11 +13,11 @@ export default function UploadedFiles() {
 
   return (
     <div className="mt-4">
-      <h3 className="text-sm font-semibold mb-2">Uploaded Documents</h3>
+      <h3 className="text-sm font-semibold mb-2 text-foreground">Uploaded Documents</h3>
 
       <ul className="space-y-1 text-sm">
         {files.map((file: any) => (
-          <li key={file._id} className="text-gray-700">
+          <li key={file._id} className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
             {file.originalName}
           </li>
         ))}
