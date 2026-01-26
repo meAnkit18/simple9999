@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { useState, useEffect, useRef } from "react";
+import Sidebar from "@/components/Sidebar";
 
 interface Project {
   id: string;
@@ -44,6 +44,16 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
+
+  // Auto-resize textarea
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+    }
+  }, [message]);
 
   // Load projects, files, and profile on mount
   useEffect(() => {
@@ -163,369 +173,299 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
-      {/* Header */}
-      <header className="border-b border-border p-4 flex justify-between items-center bg-card/50 backdrop-blur sticky top-0 z-10">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Simple9999</h1>
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-          <button
-            onClick={handleLogout}
-            className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
+    <div className="flex min-h-screen bg-background text-foreground overflow-hidden">
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onLogout={handleLogout}
+      />
 
-      <main className="max-w-5xl mx-auto p-6">
-        {/* Tabs */}
-        {/* Tabs */}
-        <div className="flex gap-4 mb-6 border-b border-border overflow-x-auto pb-1">
-          <button
-            onClick={() => setActiveTab("profile")}
-            className={`pb-3 px-2 font-medium transition-colors whitespace-nowrap ${activeTab === "profile"
-              ? "text-primary border-b-2 border-primary"
-              : "text-muted-foreground hover:text-foreground"
-              }`}
-          >
-            My Profile {hasProfile && "✓"}
-          </button>
-          <button
-            onClick={() => setActiveTab("documents")}
-            className={`pb-3 px-2 font-medium transition-colors whitespace-nowrap ${activeTab === "documents"
-              ? "text-primary border-b-2 border-primary"
-              : "text-muted-foreground hover:text-foreground"
-              }`}
-          >
-            Documents ({files.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("create")}
-            className={`pb-3 px-2 font-medium transition-colors whitespace-nowrap ${activeTab === "create"
-              ? "text-primary border-b-2 border-primary"
-              : "text-muted-foreground hover:text-foreground"
-              }`}
-          >
-            Generate Resume
-          </button>
-        </div>
+      <main className="flex-1 flex flex-col h-screen relative overflow-hidden">
+        {/* Top Bar / Mobile Header placeholder if needed, but Sidebar handles mobile toggle */}
 
-        {/* Profile Tab */}
-        {activeTab === "profile" && (
-          <section>
-            <h2 className="text-2xl font-bold mb-2">Your Profile</h2>
-            <p className="text-gray-400 mb-6">
-              This is what the AI knows about you from your uploaded documents.
-            </p>
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+          <div className="max-w-4xl mx-auto h-full flex flex-col">
 
-            {profileLoading ? (
-              <div className="bg-card border border-border rounded-lg p-8 text-center animate-pulse">
-                <div className="text-2xl mb-2">🔄</div>
-                <p className="text-muted-foreground">Analyzing your documents...</p>
+            {/* Create / Chat Tab */}
+            {activeTab === "create" && (
+              <div className="flex flex-col h-full justify-center items-center relative">
+
+                {/* Welcome / Empty State */}
+                <div className="text-center space-y-6 mb-12 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
+                  <div className="inline-block p-4 rounded-full bg-primary/5 mb-4">
+                    <span className="text-4xl">✨</span>
+                  </div>
+                  <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    What can I help you build?
+                  </h1>
+                  <p className="text-xl text-muted-foreground">
+                    I can help you create a tailored resume based on your profile and the job description.
+                  </p>
+                </div>
+
+                {/* Chat Input Area */}
+                <div className="w-full max-w-2xl relative z-10">
+                  <form onSubmit={handleSubmit} className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+                    <div className="relative bg-card border border-border/50 rounded-2xl shadow-lg transition-all duration-300 focus-within:shadow-xl focus-within:border-primary/50">
+                      <textarea
+                        ref={textareaRef}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSubmit(e);
+                          }
+                        }}
+                        placeholder="Paste a job description or describe the role..."
+                        className="w-full max-h-48 min-h-[60px] bg-transparent border-none p-4 pr-14 text-lg resize-none focus:ring-0 placeholder:text-muted-foreground/50"
+                        disabled={loading}
+                        rows={1}
+                      />
+                      <button
+                        type="submit"
+                        disabled={loading || !message.trim()}
+                        className="absolute right-2 bottom-2 p-2 bg-primary text-primary-foreground rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                      >
+                        {loading ? (
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+
+                  <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-muted-foreground">
+                    <span className="px-3 py-1 bg-accent/50 rounded-full border border-border/50">Senior Backend Engineer</span>
+                    <span className="px-3 py-1 bg-accent/50 rounded-full border border-border/50">Product Manager at Google</span>
+                    <span className="px-3 py-1 bg-accent/50 rounded-full border border-border/50">Marketing Lead</span>
+                  </div>
+                </div>
+
+                {/* Recent Projects (History) */}
+                {projects.length > 0 && (
+                  <div className="mt-16 w-full max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                    <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider">Recent Resumes</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {projects.slice(0, 4).map((p) => (
+                        <div
+                          key={p.id}
+                          onClick={() => router.push(`/editor/${p.id}`)}
+                          className="group p-4 bg-card border border-border/50 rounded-xl cursor-pointer hover:bg-accent/50 hover:border-primary/20 transition-all duration-200"
+                        >
+                          <div className="font-medium text-foreground group-hover:text-primary transition-colors truncate">{p.name}</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {new Date(p.lastModified).toLocaleDateString()}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : !hasProfile ? (
-              <div className="bg-yellow-900/30 border border-yellow-700 rounded-lg p-6">
-                <div className="text-2xl mb-2">📤</div>
-                <h3 className="text-lg font-semibold text-yellow-300 mb-2">No Profile Yet</h3>
-                <p className="text-gray-300 mb-4">
-                  Upload your LinkedIn PDF, certificates, or existing resume to build your profile.
-                  The AI will extract your information and use it to generate tailored resumes.
-                </p>
-                <button
-                  onClick={() => setActiveTab("documents")}
-                  className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-lg"
-                >
-                  Upload Documents →
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Profile Overview */}
-                {/* Profile Overview */}
-                <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold text-foreground">
-                        {profile?.fullName || "Name not found"}
-                      </h3>
-                      <div className="text-muted-foreground mt-1 space-y-1">
-                        {profile?.email && <div>📧 {profile.email}</div>}
-                        {profile?.phone && <div>📱 {profile.phone}</div>}
-                        {profile?.location && <div>📍 {profile.location}</div>}
+            )}
+
+            {/* Profile Tab */}
+            {activeTab === "profile" && (
+              <div className="animate-in fade-in zoom-in-95 duration-300">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-3xl font-bold">Your Profile</h2>
+                    <p className="text-muted-foreground mt-1">Managed by AI from your documents</p>
+                  </div>
+                  {hasProfile && (
+                    <span className="px-3 py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-sm font-medium border border-green-500/20">
+                      Active & Ready
+                    </span>
+                  )}
+                </div>
+
+                {profileLoading ? (
+                  <div className="flex flex-col items-center justify-center h-64 space-y-4">
+                    <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+                    <p className="text-muted-foreground animate-pulse">Analyzing your digital footprint...</p>
+                  </div>
+                ) : !hasProfile ? (
+                  <div className="text-center py-12 bg-card border border-dashed border-border rounded-2xl">
+                    <div className="text-6xl mb-4">👤</div>
+                    <h3 className="text-xl font-semibold mb-2">Profile Not Found</h3>
+                    <p className="text-muted-foreground max-w-md mx-auto mb-6">
+                      Upload your resume or LinkedIn PDF to let the AI build your professional profile automatically.
+                    </p>
+                    <button
+                      onClick={() => setActiveTab("documents")}
+                      className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      Go to Documents
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Header Card */}
+                    <div className="bg-card border border-border rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                      <div className="relative">
+                        <h3 className="text-2xl font-bold">{profile?.fullName}</h3>
+                        <div className="flex flex-wrap gap-4 mt-2 text-muted-foreground">
+                          {profile?.email && <span className="flex items-center gap-1">📧 {profile.email}</span>}
+                          {profile?.phone && <span className="flex items-center gap-1">📱 {profile.phone}</span>}
+                          {profile?.location && <span className="flex items-center gap-1">📍 {profile.location}</span>}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-green-600 dark:text-green-400 text-sm bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full border border-green-200 dark:border-green-800">
-                      ✓ Profile Ready
-                    </div>
-                  </div>
-                </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-card border border-border rounded-lg p-4 text-center shadow-sm">
-                    <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{profile?.skillsCount || 0}</div>
-                    <div className="text-muted-foreground text-sm">Skills</div>
-                  </div>
-                  <div className="bg-card border border-border rounded-lg p-4 text-center shadow-sm">
-                    <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{profile?.experienceCount || 0}</div>
-                    <div className="text-muted-foreground text-sm">Experiences</div>
-                  </div>
-                  <div className="bg-card border border-border rounded-lg p-4 text-center shadow-sm">
-                    <div className="text-3xl font-bold text-green-600 dark:text-green-400">{profile?.educationCount || 0}</div>
-                    <div className="text-muted-foreground text-sm">Education</div>
-                  </div>
-                  <div className="bg-card border border-border rounded-lg p-4 text-center shadow-sm">
-                    <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">{profile?.certificationsCount || 0}</div>
-                    <div className="text-muted-foreground text-sm">Certifications</div>
-                  </div>
-                </div>
-
-                {/* Skills */}
-                {profile?.skills && profile.skills.length > 0 && (
-                  <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-                    <h4 className="text-lg font-semibold mb-3 text-foreground">Skills</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {profile.skills.slice(0, 20).map((skill, i) => (
-                        <span key={i} className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-sm border border-blue-200 dark:border-blue-800">
-                          {skill}
-                        </span>
-                      ))}
-                      {profile.skills.length > 20 && (
-                        <span className="text-muted-foreground text-sm">+{profile.skills.length - 20} more</span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Experience */}
-                {profile?.experience && profile.experience.length > 0 && (
-                  <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-                    <h4 className="text-lg font-semibold mb-3 text-foreground">Experience</h4>
-                    <div className="space-y-3">
-                      {profile.experience.slice(0, 5).map((exp, i) => (
-                        <div key={i} className="border-l-2 border-purple-500 pl-4">
-                          <div className="font-medium text-foreground">{exp.title}</div>
-                          <div className="text-muted-foreground text-sm">{exp.company} • {exp.duration}</div>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {[
+                        { label: "Skills", value: profile?.skillsCount, color: "text-blue-500" },
+                        { label: "Experience", value: profile?.experienceCount, color: "text-purple-500" },
+                        { label: "Education", value: profile?.educationCount, color: "text-green-500" },
+                        { label: "Certs", value: profile?.certificationsCount, color: "text-orange-500" },
+                      ].map((stat, i) => (
+                        <div key={i} className="bg-card border border-border rounded-xl p-4 text-center hover:border-primary/20 transition-colors">
+                          <div className={`text-3xl font-bold ${stat.color}`}>{stat.value || 0}</div>
+                          <div className="text-xs text-muted-foreground uppercase tracking-wider mt-1">{stat.label}</div>
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
 
-                {/* Education */}
-                {profile?.education && profile.education.length > 0 && (
-                  <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
-                    <h4 className="text-lg font-semibold mb-3 text-foreground">Education</h4>
-                    <div className="space-y-3">
-                      {profile.education.map((edu, i) => (
-                        <div key={i} className="border-l-2 border-green-500 pl-4">
-                          <div className="font-medium text-foreground">{edu.degree}</div>
-                          <div className="text-muted-foreground text-sm">{edu.institution} • {edu.year}</div>
+                    {/* Skills Cloud */}
+                    {profile?.skills && profile.skills.length > 0 && (
+                      <div className="bg-card border border-border rounded-2xl p-6">
+                        <h4 className="text-lg font-semibold mb-4">Skills Cloud</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {profile.skills.map((skill, i) => (
+                            <span
+                              key={i}
+                              className="px-3 py-1 bg-accent/50 text-foreground rounded-full text-sm border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-colors cursor-default"
+                            >
+                              {skill}
+                            </span>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
+
+                    {/* Experience Timeline */}
+                    {profile?.experience && profile.experience.length > 0 && (
+                      <div className="bg-card border border-border rounded-2xl p-6">
+                        <h4 className="text-lg font-semibold mb-4">Experience</h4>
+                        <div className="space-y-6">
+                          {profile.experience.map((exp, i) => (
+                            <div key={i} className="relative pl-6 border-l-2 border-border last:border-0">
+                              <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-background border-2 border-primary" />
+                              <div className="font-medium text-lg">{exp.title}</div>
+                              <div className="text-primary/80">{exp.company}</div>
+                              <div className="text-sm text-muted-foreground mt-1">{exp.duration}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
+              </div>
+            )}
 
-                {/* CTA */}
-                <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 border border-purple-700/50 rounded-lg p-6 text-center">
-                  <h4 className="text-lg font-semibold mb-2 text-white">Ready to Generate a Tailored Resume?</h4>
-                  <p className="text-gray-200 mb-4">
-                    Now that we know your background, tell us about the company or job you're applying to.
-                  </p>
-                  <button
-                    onClick={() => setActiveTab("create")}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-                  >
-                    Generate Resume →
-                  </button>
+            {/* Documents Tab */}
+            {activeTab === "documents" && (
+              <div className="animate-in fade-in zoom-in-95 duration-300">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-3xl font-bold">Document Vault</h2>
+                    <p className="text-muted-foreground mt-1">Manage your source materials</p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </section>
-        )}
 
-        {/* Create Resume Tab */}
-        {activeTab === "create" && (
-          <>
-            {/* Step indicator */}
-            {!hasProfile && (
-              <div className="bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4 mb-6">
-                <p className="text-yellow-800 dark:text-yellow-300">
-                  <strong>⚠️ No profile found.</strong> Upload your documents first for personalized resumes.
-                </p>
-                <button
-                  onClick={() => setActiveTab("documents")}
-                  className="mt-2 text-yellow-600 dark:text-yellow-400 hover:text-yellow-500 dark:hover:text-yellow-300 text-sm underline"
-                >
-                  Go to Documents →
-                </button>
-              </div>
-            )}
-
-            {hasProfile && (
-              <div className="bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg p-4 mb-6 flex items-center justify-between">
-                <div>
-                  <p className="text-green-800 dark:text-green-300">
-                    <strong>✓ Profile Ready:</strong> {profile?.fullName}
-                  </p>
-                  <p className="text-muted-foreground text-sm">
-                    {profile?.skillsCount} skills • {profile?.experienceCount} experiences • {profile?.educationCount} education
-                  </p>
+                {/* Upload Zone */}
+                <div className="mb-8">
+                  <label className="block w-full cursor-pointer group">
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      onChange={uploadFile}
+                      disabled={uploading}
+                      className="hidden"
+                    />
+                    <div className="border-2 border-dashed border-border rounded-2xl p-12 text-center transition-all duration-300 group-hover:border-primary/50 group-hover:bg-primary/5">
+                      <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                        {uploading ? (
+                          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                          </svg>
+                        )}
+                      </div>
+                      <h3 className="text-lg font-semibold mb-2">
+                        {uploading ? "Processing Document..." : "Click to Upload PDF"}
+                      </h3>
+                      <p className="text-muted-foreground max-w-sm mx-auto">
+                        Upload LinkedIn profiles, resumes, or cover letters. We'll extract the text automatically.
+                      </p>
+                    </div>
+                  </label>
                 </div>
-                <button
-                  onClick={() => setActiveTab("profile")}
-                  className="text-green-600 dark:text-green-400 hover:text-green-500 dark:hover:text-green-300 text-sm"
-                >
-                  View Profile
-                </button>
-              </div>
-            )}
 
-            {/* Chat Input - Core Feature */}
-            <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-2 text-foreground">Generate Tailored Resume</h2>
-              <p className="text-muted-foreground mb-4">
-                Describe the company, job role, or requirements. The AI will create a resume
-                using your profile data, optimized for this specific opportunity.
-              </p>
-              <form onSubmit={handleSubmit}>
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Example: I'm applying for a Senior Backend Engineer position at a fintech startup. They use Node.js, PostgreSQL, and AWS. The job requires experience with payment systems and microservices. They value scalability and clean code."
-                  className="w-full h-36 bg-card border border-input rounded-lg p-4 text-foreground resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted-foreground"
-                  disabled={loading}
-                />
-                <button
-                  type="submit"
-                  disabled={loading || !message.trim()}
-                  className="mt-3 w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50 disabled:cursor-not-allowed py-3 rounded-lg font-semibold transition-colors"
-                >
-                  {loading ? "Generating Your Tailored Resume..." : "Generate Resume"}
-                </button>
-              </form>
-            </section>
-
-            {/* Projects List */}
-            <section>
-              <h2 className="text-lg font-semibold mb-3 text-foreground">Your Resumes</h2>
-              {projects.length === 0 ? (
-                <p className="text-muted-foreground">No resumes yet. Generate one above!</p>
-              ) : (
-                <div className="space-y-2">
-                  {projects.map((p) => (
+                {/* Files Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {files.map((f) => (
                     <div
-                      key={p.id}
-                      onClick={() => router.push(`/editor/${p.id}`)}
-                      className="bg-card border border-border p-4 rounded-lg cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors shadow-sm"
+                      key={f.id}
+                      className="group bg-card border border-border rounded-xl p-4 hover:shadow-md transition-all duration-200"
                     >
-                      <div className="font-medium text-foreground">{p.name}</div>
-                      <div className="text-muted-foreground text-sm">
-                        Last modified: {new Date(p.lastModified).toLocaleDateString()}
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-red-500/10 text-red-500 rounded-lg">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                              <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="font-medium truncate max-w-[200px]" title={f.name}>{f.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {new Date(f.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                        {f.url && (
+                          <a
+                            href={f.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 text-muted-foreground hover:text-primary transition-colors"
+                            title="View File"
+                          >
+                            ↗
+                          </a>
+                        )}
+                      </div>
+                      <div className="mt-4 flex items-center gap-2 text-xs">
+                        {f.chunksCount > 0 ? (
+                          <span className="px-2 py-1 bg-green-500/10 text-green-600 rounded-full flex items-center gap-1">
+                            ✓ {f.chunksCount} chunks
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-yellow-500/10 text-yellow-600 rounded-full">
+                            Processing...
+                          </span>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
-              )}
-            </section>
-          </>
-        )}
-
-        {/* Documents Tab */}
-        {activeTab === "documents" && (
-          <section>
-            <h2 className="text-2xl font-bold mb-2 text-foreground">Document Vault</h2>
-            <p className="text-muted-foreground mb-6">
-              Upload your career documents. The AI will extract your information to build your profile.
-            </p>
-
-            {/* Upload Area */}
-            <div className="bg-card border-2 border-dashed border-border rounded-lg p-8 text-center mb-6 hover:bg-accent/50 transition-colors">
-              <div className="text-4xl mb-3">📄</div>
-              <p className="text-muted-foreground mb-4">
-                Upload LinkedIn PDF, certificates, recommendation letters, or old resumes
-              </p>
-              <label className="inline-block">
-                <input
-                  type="file"
-                  accept=".pdf"
-                  onChange={uploadFile}
-                  disabled={uploading}
-                  className="hidden"
-                />
-                <span className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg cursor-pointer inline-block transition-colors">
-                  {uploading ? "Uploading & Processing..." : "Choose File"}
-                </span>
-              </label>
-              <p className="text-muted-foreground text-sm mt-3">Supports PDF files</p>
-            </div>
-
-            {/* Files List */}
-            {files.length === 0 ? (
-              <p className="text-muted-foreground text-center">
-                No documents uploaded yet. Upload your first document to get started!
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {files.map((f) => (
-                  <div
-                    key={f.id}
-                    className="bg-card border border-border p-4 rounded-lg flex items-center justify-between shadow-sm"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="text-2xl">
-                        {f.type === "application/pdf" ? "📕" : "📄"}
-                      </div>
-                      <div>
-                        <div className="font-medium text-foreground">{f.name}</div>
-                        <div className="text-muted-foreground text-sm">
-                          {new Date(f.createdAt).toLocaleDateString()} •{" "}
-                          {f.chunksCount > 0 ? (
-                            <span className="text-green-600 dark:text-green-400">
-                              {f.chunksCount} chunks indexed ✓
-                            </span>
-                          ) : (
-                            <span className="text-yellow-600 dark:text-yellow-400">No text extracted</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {f.url && (
-                      <a
-                        href={f.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
-                      >
-                        View
-                      </a>
-                    )}
-                  </div>
-                ))}
               </div>
             )}
-
-            {/* After uploading, show next step */}
-            {files.length > 0 && (
-              <div className="mt-6 bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-lg p-4 text-center">
-                <p className="text-blue-800 dark:text-blue-300 mb-2">
-                  ✓ Documents uploaded! Your profile is being built from these files.
-                </p>
-                <button
-                  onClick={() => {
-                    loadProfile();
-                    setActiveTab("profile");
-                  }}
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline"
-                >
-                  View Your Profile →
-                </button>
-              </div>
-            )}
-          </section>
-        )}
+          </div>
+        </div>
       </main>
     </div>
   );
