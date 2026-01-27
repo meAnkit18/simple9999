@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "@/components/Sidebar";
+import { Logo } from "@/components/Logo";
 import {
   Sparkles,
   User,
@@ -233,14 +234,14 @@ export default function Dashboard() {
 
                 {/* Welcome / Empty State */}
                 <div className="text-center space-y-6 mb-12 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  {/* <div className="inline-block p-4 rounded-full bg-primary/5 mb-4">
-                    <Sparkles className="w-10 h-10 text-primary" />
-                  </div> */}
+                  <div className="inline-block p-4 rounded-full bg-primary/5 mb-4">
+                    <Logo className="w-12 h-12 text-primary" />
+                  </div>
                   <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                     What can I help you build?
                   </h1>
                   <p className="text-xl text-muted-foreground">
-                    I can help you create a tailored resume based on your profile and the job description.
+                    I can help you create resume based on your profile and the job description.
                   </p>
                 </div>
 

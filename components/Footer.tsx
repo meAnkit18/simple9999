@@ -8,7 +8,7 @@ export function Footer() {
                 <div className="flex flex-col md:flex-row justify-between items-start mb-24 md:mb-32 gap-12">
                     <div className="max-w-md">
                         <h2 className="text-3xl md:text-4xl font-medium tracking-tight">
-                            Experience liftoff
+                            Experience Simplicity
                         </h2>
                     </div>
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useRouter } from "next/navigation";
+import { Logo } from "@/components/Logo";
 import {
   MessageSquarePlus,
   Folder,
@@ -59,12 +60,15 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarPr
         `}
       >
         {/* Header */}
-        <div className={`p-4 flex items-center ${isCollapsed ? "justify-center" : "justify-between"} border-b border-border/50`}>
-          {!isCollapsed && (
-            <h1 className="font-bold text-xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent truncate">
-              Simple9999
-            </h1>
-          )}
+        <div className={`p-4 flex ${isCollapsed ? "flex-col gap-4 items-center" : "flex-row items-center justify-between"} border-b border-border/50`}>
+          <div className={`flex items-center gap-2 ${isCollapsed ? "justify-center" : ""}`}>
+            <Logo className="w-8 h-8 text-primary" />
+            {!isCollapsed && (
+              <h1 className="font-bold text-xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent truncate">
+                Simple9999
+              </h1>
+            )}
+          </div>
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors"
