@@ -16,7 +16,8 @@ import {
   MapPin,
   ExternalLink,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  Trash2
 } from "lucide-react";
 
 interface Project {
@@ -181,6 +182,31 @@ export default function Dashboard() {
     }
   }
 
+  // Delete document
+  async function deleteFile(fileId: string, fileName: string) {
+    if (!confirm(`Are you sure you want to delete "${fileName}"? This cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/files/${fileId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setFiles(files.filter(f => f.id !== fileId));
+        // Refresh profile if needed, as deleting a file might change the profile context
+        setTimeout(() => loadProfile(), 1000);
+      } else {
+        alert(data.error || "Failed to delete file");
+      }
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Failed to delete file");
+    }
+  }
+
   // Logout
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -207,9 +233,9 @@ export default function Dashboard() {
 
                 {/* Welcome / Empty State */}
                 <div className="text-center space-y-6 mb-12 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
-                  <div className="inline-block p-4 rounded-full bg-primary/5 mb-4">
+                  {/* <div className="inline-block p-4 rounded-full bg-primary/5 mb-4">
                     <Sparkles className="w-10 h-10 text-primary" />
-                  </div>
+                  </div> */}
                   <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                     What can I help you build?
                   </h1>
@@ -220,7 +246,7 @@ export default function Dashboard() {
 
                 {/* Chat Input Area */}
                 <div className="w-full max-w-2xl relative z-10">
-                  <form onSubmit={handleSubmit} className="relative group">
+                  {/* <form onSubmit={handleSubmit} className="relative group">
                     <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
                     <div className="relative bg-card border border-border/50 rounded-2xl shadow-lg transition-all duration-300 focus-within:shadow-xl focus-within:border-primary/50">
                       <textarea
@@ -253,7 +279,92 @@ export default function Dashboard() {
                         )}
                       </button>
                     </div>
+                  </form> */}
+
+                  <form onSubmit={handleSubmit} className="relative group">
+
+                    {/* soft hover glow only */}
+                    <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary/20 to-purple-500/20 blur opacity-0 group-hover:opacity-30 transition duration-500 pointer-events-none" />
+
+                    {/* input container */}
+                    <div
+                      className="
+      relative
+      bg-card
+      rounded-2xl
+      border border-transparent
+      shadow-md
+      transition-all duration-200
+
+      focus-within:border-primary/40
+      focus-within:shadow-lg
+    "
+                    >
+                      <textarea
+                        ref={textareaRef}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSubmit(e);
+                          }
+                        }}
+                        placeholder="Paste a job description or describe the role..."
+                        disabled={loading}
+                        rows={1}
+                        className="
+        w-full
+        min-h-[60px]
+        max-h-48
+        bg-transparent
+        border-none
+        outline-none
+        focus:ring-0
+        resize-none
+        p-4
+        pr-14
+        text-lg
+        placeholder:text-muted-foreground/50
+      "
+                      />
+
+                      <button
+                        type="submit"
+                        disabled={loading || !message.trim()}
+                        className="
+        absolute right-2 bottom-2
+        p-2
+        rounded-xl
+        bg-primary
+        text-primary-foreground
+        hover:opacity-90
+        disabled:opacity-50
+        disabled:cursor-not-allowed
+        transition
+      "
+                      >
+                        {loading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <line x1="22" y1="2" x2="11" y2="13" />
+                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
                   </form>
+
 
                   <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm text-muted-foreground">
                     <span className="px-3 py-1 bg-accent/50 rounded-full border border-border/50">Senior Backend Engineer</span>
@@ -462,6 +573,13 @@ export default function Dashboard() {
                             <ExternalLink className="w-4 h-4" />
                           </a>
                         )}
+                        <button
+                          onClick={() => deleteFile(f.id, f.name)}
+                          className="p-2 text-muted-foreground hover:text-red-500 transition-colors"
+                          title="Delete File"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                       <div className="mt-4 flex items-center gap-2 text-xs">
                         {f.chunksCount > 0 ? (

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getUserFromToken } from "@/lib/auth";
-import { extractUserProfile } from "@/lib/user-profile";
+import User from "@/models/User";
 
 export async function GET() {
     try {
@@ -14,7 +14,22 @@ export async function GET() {
 
         console.log("[Profile API] Extracting profile for user:", userId);
 
-        const profile = await extractUserProfile(userId);
+        const user = await User.findById(userId);
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        const profile = user.profileData;
+
+        // Optimization: We no longer extract on read. Extraction happens on upload/delete.
+        // If profile is missing but user has uploads, it might be processing or failed.
+        if (!profile && user.hasNewUploads) {
+            console.log("[Profile API] Profile missing but marked as having new uploads. Triggering background update.");
+            // Fire and forget update if needed, but ideally this is handled by upload/delete
+            // updateUserProfile(userId); 
+        }
+
+        console.log("[Profile API] Returning cached profile.");
 
         if (!profile) {
             return NextResponse.json({

@@ -3,6 +3,7 @@ import cloudinary from "@/lib/cloudinary";
 import { extractText } from "@/lib/text-extract";
 import { embeddings } from "@/lib/embeddings";
 import { chunkText } from "@/lib/chunk-text";
+import { updateUserProfile } from "@/lib/user-profile";
 import File from "@/models/File";
 import { connectDB } from "@/lib/db";
 import { getUserFromToken } from "@/lib/auth";
@@ -75,6 +76,12 @@ export async function POST(req: NextRequest) {
       cloudinaryUrl: upload.secure_url,
       chunks: embeddedChunks,
     });
+
+    // Invalidate profile cache
+    // await User.findByIdAndUpdate(userId, { hasNewUploads: true });
+
+    // Trigger profile update immediately
+    await updateUserProfile(userId);
 
     return NextResponse.json({
       success: true,

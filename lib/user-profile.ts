@@ -1,4 +1,5 @@
 import File from "@/models/File";
+import User from "@/models/User";
 import mongoose from "mongoose";
 import { ChatGroq } from "@langchain/groq";
 
@@ -152,6 +153,25 @@ Return ONLY valid JSON, no markdown.`;
             achievements: [],
             rawText,
         };
+    }
+}
+
+/**
+ * Extract and save user profile to database
+ */
+export async function updateUserProfile(userId: string): Promise<void> {
+    try {
+        const profile = await extractUserProfile(userId);
+
+        // Always update, even if null (to clear old data if all files deleted)
+        await User.findByIdAndUpdate(userId, {
+            profileData: profile,
+            hasNewUploads: false
+        });
+
+        console.log("[User Profile] Database updated for user:", userId);
+    } catch (err) {
+        console.error("[User Profile] Failed to update user profile in DB:", err);
     }
 }
 
