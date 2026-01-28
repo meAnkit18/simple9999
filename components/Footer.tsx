@@ -16,7 +16,7 @@ export function Footer() {
                         <div className="flex flex-col gap-4">
                             <h3 className="font-medium text-lg">Product</h3>
                             <ul className="flex flex-col gap-3 text-muted-foreground">
-                                <li><a href="#" className="hover:text-foreground transition-colors">Download</a></li>
+                                {/* <li><a href="#" className="hover:text-foreground transition-colors">Download</a></li> */}
                                 <li><a href="#" className="hover:text-foreground transition-colors">Product</a></li>
                                 <li><a href="#" className="hover:text-foreground transition-colors">Docs</a></li>
                                 <li><a href="#" className="hover:text-foreground transition-colors">Changelog</a></li>
