@@ -9,7 +9,7 @@ import { WaterDotsBackground } from "@/components/ui/water-dots-background";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 overflow-x-hidden font-sans selection:bg-primary/20">
+    <div className="min-h-screen bg-background text-foreground transition-colonomrs duration-300 overflow-x-hidden font-sans selection:bg-primary/20">
       <div className="fixed inset-0 -z-10">
 
       </div>
