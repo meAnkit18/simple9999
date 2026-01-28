@@ -11,6 +11,7 @@
 
   --animate-fade-in: fade-in 1s ease-out forwards;
   --animate-fade-in-up: fade-in-up 1s ease-out forwards;
+  --animate-blink: blink 1s step-end infinite;
 
   @keyframes fade-in {
     0% {
@@ -31,6 +32,18 @@
     100% {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes blink {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0;
     }
   }
 }

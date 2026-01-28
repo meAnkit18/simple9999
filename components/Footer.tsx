@@ -36,7 +36,7 @@ export function Footer() {
                 {/* Middle Section - Huge Text */}
                 <div className="w-full flex justify-center mb-24 md:mb-32">
                     <div className="flex flex-col items-center gap-4">
-                        <Logo className="h-24 w-24 md:h-32 md:w-32 text-foreground" />
+                        {/* <Logo className="h-24 w-24 md:h-32 md:w-32 text-foreground" /> */}
                         <h1 className="text-[11vw] leading-none font-bold tracking-tighter text-foreground select-none">
                             Simple9999.com
                         </h1>

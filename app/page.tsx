@@ -5,6 +5,11 @@ import { MagneticButton } from "@/components/ui/magnetic-button";
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/Logo";
 import { WaterDotsBackground } from "@/components/ui/water-dots-background";
+import { AnimatedVideoSection } from "@/components/ui/animated-video-section";
+import { TypewriterText } from "@/components/ui/typewriter-text";
+import { ScatteredDocumentVisual } from "@/components/ui/scattered-document-visual";
+import { ResumeCustomizationVisual } from "@/components/ui/resume-customization-visual";
+import { ATSScoreVisual } from "@/components/ui/ats-score-visual";
 
 
 export default function Home() {
@@ -45,9 +50,7 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      {/* Hero Section */}
-      {/* Hero Section */}
+
       {/* Hero Section */}
       <main className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden">
         <WaterDotsBackground className="z-0" />
@@ -67,6 +70,85 @@ export default function Home() {
           </p>
         </div>
       </main>
+
+      {/* Video Section */}
+      <AnimatedVideoSection />
+
+      {/* Tagline Section */}
+      <section className="w-full px-6 py-24 md:py-32">
+        <div className="max-w-[1400px] mx-auto text-left">
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+            <TypewriterText text="Simple9999 is agentic Resume builder website," speed={40} showCursor />
+            <br />
+            <span className="text-muted-foreground">
+              <TypewriterText text="Just by pasting job requirements" speed={40} delay={2000} showCursor />
+            </span>
+          </h2>
+        </div>
+      </section>
+
+      {/* Scattered Documents Section */}
+      <section className="w-full px-6 py-24 md:py-32">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+            {/* Left - Text */}
+            <div className="flex-1">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
+                <TypewriterText text="Scattered documents" speed={50} showCursor />
+              </h3>
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                Certificates, achievements, PDFs, and proofs are often lost or stored across multiple platforms.
+              </p>
+            </div>
+            {/* Right - Visual */}
+            <div className="flex-1 w-full h-[300px] md:h-[400px]">
+              <ScatteredDocumentVisual />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Resume Customization Section */}
+      <section className="w-full px-6 py-24 md:py-32">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-col md:flex-row-reverse items-center gap-12 md:gap-16">
+            {/* Right - Text */}
+            <div className="flex-1">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
+                <TypewriterText text="Company-specific resume customization" speed={40} showCursor />
+              </h3>
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                Creating a tailored resume for every company is time-consuming and mentally exhausting.
+              </p>
+            </div>
+            {/* Left - Visual */}
+            <div className="flex-1 w-full h-[300px] md:h-[400px]">
+              <ResumeCustomizationVisual />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ATS Score Section */}
+      <section className="w-full px-6 py-24 md:py-32">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+            {/* Left - Text */}
+            <div className="flex-1">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
+                <TypewriterText text="ATS Score" speed={60} showCursor />
+              </h3>
+              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+                Many resumes get rejected before a human ever sees them due to poor ATS compatibility.
+              </p>
+            </div>
+            {/* Right - Visual */}
+            <div className="flex-1 w-full h-[300px] md:h-[400px]">
+              <ATSScoreVisual />
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div>
