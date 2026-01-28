@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 export default function LoginPage() {
     const [form, setForm] = useState({ email: "", password: "" });
@@ -37,60 +38,63 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4">
-            <div className="max-w-md w-full p-8 bg-card text-card-foreground rounded-lg shadow-md border border-border">
-                <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
+        <div className="min-h-screen flex flex-col bg-background">
+            <Navbar />
+            <div className="flex-1 flex items-center justify-center p-4">
+                <div className="max-w-md w-full p-8 bg-card text-card-foreground rounded-lg shadow-md border border-border">
+                    <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
 
-                {error && (
-                    <div className="mb-4 p-3 bg-destructive/15 text-destructive rounded text-sm font-medium">
-                        {error}
-                    </div>
-                )}
+                    {error && (
+                        <div className="mb-4 p-3 bg-destructive/15 text-destructive rounded text-sm font-medium">
+                            {error}
+                        </div>
+                    )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            placeholder="Enter your email"
-                            className="border border-input bg-background p-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-ring"
-                            value={form.email}
-                            onChange={(e) => setForm({ ...form, email: e.target.value })}
-                            required
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-1">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                placeholder="Enter your email"
+                                className="border border-input bg-background p-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-ring"
+                                value={form.email}
+                                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                                required
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            placeholder="Enter your password"
-                            className="border border-input bg-background p-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-ring"
-                            value={form.password}
-                            onChange={(e) => setForm({ ...form, password: e.target.value })}
-                            required
-                        />
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">
+                                Password
+                            </label>
+                            <input
+                                type="password"
+                                placeholder="Enter your password"
+                                className="border border-input bg-background p-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-ring"
+                                value={form.password}
+                                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                                required
+                            />
+                        </div>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="bg-primary text-primary-foreground p-3 w-full rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                    >
-                        {loading ? "Logging in..." : "Login"}
-                    </button>
-                </form>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="bg-primary text-primary-foreground p-3 w-full rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                        >
+                            {loading ? "Logging in..." : "Login"}
+                        </button>
+                    </form>
 
-                <p className="mt-4 text-center text-muted-foreground text-sm">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="text-primary font-medium hover:underline">
-                        Sign up
-                    </Link>
-                </p>
+                    <p className="mt-4 text-center text-muted-foreground text-sm">
+                        Don&apos;t have an account?{" "}
+                        <Link href="/signup" className="text-primary font-medium hover:underline">
+                            Sign up
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

@@ -150,6 +150,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Video Section - Above Footer */}
+      <AnimatedVideoSection />
+
       <Footer />
     </div>
   );
