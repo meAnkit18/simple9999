@@ -1,16 +1,12 @@
-import { ChatGroq } from "@langchain/groq";
 import { UserProfile, formatProfileForAI } from "./user-profile";
-
-const model = new ChatGroq({
-  apiKey: process.env.GROQ_API_KEY!,
-  model: "llama-3.3-70b-versatile",
-  temperature: 0.3,
-});
+import { invokeLLM } from "./llm-client";
 
 // Professional LaTeX Resume Template
 const LATEX_TEMPLATE = `%-------------------------
 % Resume in Latex
-% Professional ATS-Friendly Template
+% Author : Abey George
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
 %------------------------
 
 \\documentclass[letterpaper,11pt]{article}
@@ -25,6 +21,7 @@ const LATEX_TEMPLATE = `%-------------------------
 \\usepackage[hidelinks]{hyperref}
 \\usepackage[english]{babel}
 \\usepackage{tabularx}
+\\usepackage{fontawesome5}
 \\usepackage{multicol}
 \\usepackage{graphicx}
 \\setlength{\\multicolsep}{-3.0pt}
@@ -33,6 +30,7 @@ const LATEX_TEMPLATE = `%-------------------------
 
 \\RequirePackage{tikz}
 \\RequirePackage{xcolor}
+\\RequirePackage{fontawesome}
 \\usepackage{tikz}
 \\usetikzlibrary{svg.path}
 
@@ -65,41 +63,42 @@ const LATEX_TEMPLATE = `%-------------------------
 \\raggedright
 \\setlength{\\tabcolsep}{0in}
 
-% Sections formatting - reduced negative vspace to prevent overlap
+% Sections formatting
 \\titleformat{\\section}{
-  \\vspace{-3pt}\\scshape\\raggedright\\large\\bfseries
-}{}{0em}{}[\\color{black}\\titlerule \\vspace{-3pt}]
+  \\vspace{-4pt}\\scshape\\raggedright\\large\\bfseries
+}{}{0em}{}[\\color{black}\\titlerule \\vspace{-5pt}]
 
 % Ensure that generate pdf is machine readable/ATS parsable
 \\pdfgentounicode=1
 
 %-------------------------
-% Custom commands - with proper spacing to prevent overlapping
+% Custom commands
 \\newcommand{\\resumeItem}[1]{
   \\item\\small{
-    {#1 \\vspace{-1pt}}
+    {#1 \\vspace{-2pt}}
   }
 }
 
 \\newcommand{\\classesList}[4]{
     \\item\\small{
-        {#1 #2 #3 #4 \\vspace{-1pt}}
+        {#1 #2 #3 #4 \\vspace{-2pt}}
   }
 }
 
 \\newcommand{\\resumeSubheading}[4]{
-  \\vspace{-1pt}\\item
+  \\vspace{-2pt}\\item
     \\begin{tabular*}{1.0\\textwidth}[t]{l@{\\extracolsep{\\fill}}r}
       \\textbf{\\large#1} & \\textbf{\\small #2} \\\\
       \\textit{\\large#3} & \\textit{\\small #4} \\\\
-    \\end{tabular*}\\vspace{-5pt}
+      
+    \\end{tabular*}\\vspace{-7pt}
 }
 
 \\newcommand{\\resumeSubSubheading}[2]{
     \\item
     \\begin{tabular*}{0.97\\textwidth}{l@{\\extracolsep{\\fill}}r}
       \\textit{\\small#1} & \\textit{\\small #2} \\\\
-    \\end{tabular*}\\vspace{-5pt}
+    \\end{tabular*}\\vspace{-7pt}
 }
 
 
@@ -107,18 +106,18 @@ const LATEX_TEMPLATE = `%-------------------------
     \\item
     \\begin{tabular*}{1.001\\textwidth}{l@{\\extracolsep{\\fill}}r}
       \\small#1 & \\textbf{\\small #2}\\\\
-    \\end{tabular*}\\vspace{-5pt}
+    \\end{tabular*}\\vspace{-7pt}
 }
 
-\\newcommand{\\resumeSubItem}[1]{\\resumeItem{#1}\\vspace{-2pt}}
+\\newcommand{\\resumeSubItem}[1]{\\resumeItem{#1}\\vspace{-4pt}}
 
 \\renewcommand\\labelitemi{$\\vcenter{\\hbox{\\tiny$\\bullet$}}$}
 \\renewcommand\\labelitemii{$\\vcenter{\\hbox{\\tiny$\\bullet$}}$}
 
 \\newcommand{\\resumeSubHeadingListStart}{\\begin{itemize}[leftmargin=0.0in, label={}]}
 \\newcommand{\\resumeSubHeadingListEnd}{\\end{itemize}}
-\\newcommand{\\resumeItemListStart}{\\begin{itemize}[topsep=0pt, partopsep=0pt]}
-\\newcommand{\\resumeItemListEnd}{\\end{itemize}\\vspace{-3pt}}
+\\newcommand{\\resumeItemListStart}{\\begin{itemize}}
+\\newcommand{\\resumeItemListEnd}{\\end{itemize}\\vspace{-5pt}}
 
 
 \\newcommand\\sbullet[1][.5]{\\mathbin{\\vcenter{\\hbox{\\scalebox{#1}{$\\bullet$}}}}}
@@ -157,22 +156,18 @@ const LATEX_SYSTEM = `You are an expert LaTeX resume builder. You MUST use the E
 
 IMPORTANT RULES:
 1. Use the EXACT custom commands from the template: \\resumeSubheading, \\resumeItem, \\resumeProjectHeading, etc.
-2. Keep the same color scheme and formatting
-3. DO NOT use any icons or emojis in the resume - use plain text only for contact info (use | as separator)
-4. Structure sections exactly as shown
-5. Make it ATS-friendly and professional
-6. Keep to ONE page if possible
-7. DO NOT include image references like \\includegraphics for external images (codeforces.jpg, leetcode.png, etc.) - just use text links instead
-8. DO NOT use fontawesome, fontawesome5, or any icon packages - keep the resume clean with plain text only
+2. Keep the same color scheme and formatting (cvblue, darkcolor, etc.)
+3. STRUCTURE: Use \\section{SECTION NAME} followed by \\resumeSubHeadingListStart ...
+4. HELPFUL COMMANDS: Use \\href{url}{text} for links. 
+5. NO LOGOS: DO NOT include image references like \\includegraphics for external images. FontAwesome icons (\\faPhone, \\faGithub, etc.) ARE allowed and encouraged instead of images.
+6. Make it ATS-friendly and professional
+7. Keep to ONE page if possible
+8. Do NOT use markdown code blocks in output, just raw LaTeX.
 
 CRITICAL SPACING RULES (TO PREVENT OVERLAPPING TEXT):
-9. NEVER use \\\\vspace with values more negative than -5pt (e.g., DO NOT use \\\\vspace{-12pt}, \\\\vspace{-15pt}, etc.)
-10. After each section, use at most \\\\vspace{-5pt} - excessive negative spacing causes lines to overlap
-11. Between sections, ensure proper spacing - prefer no \\\\vspace or small values like \\\\vspace{2pt}
-12. After \\\\resumeItemListEnd, DO NOT add extra negative vspace - the template already handles this
-13. After \\\\resumeSubHeadingListEnd, DO NOT add additional negative vspace
-14. Keep the itemize list spacing as defined in the template
-15. Each line break (\\\\\\\\) should be followed by appropriate \\\\vspace if needed, never exceeding -3pt`;
+9. Respect the template's spacing. \\vspace{-7pt} is standard for headings in this template using the custom commands.
+10. Do not add excessive negative vspace manually unless necessary.
+`;
 
 /**
  * Generate a tailored LaTeX resume based on:
@@ -332,8 +327,8 @@ Output ONLY raw LaTeX code, no markdown code blocks.
   console.log("  - Profile name:", userProfile?.fullName || "N/A");
   console.log("  - Company requirements length:", companyRequirements?.length || 0);
 
-  const response = await model.invoke(fullPrompt);
-  let latex = response.content as string;
+  const response = await invokeLLM(fullPrompt, { temperature: 0.3 });
+  let latex = response.content;
 
   // Clean markdown code blocks if present
   latex = latex.replace(/^```latex\s*/i, "").replace(/```\s*$/, "");
@@ -377,8 +372,8 @@ IMPORTANT: You MUST respond with valid JSON in this exact format:
 
 The summary should be descriptive and explain what was changed, not just "Changes applied".`;
 
-  const response = await model.invoke(prompt);
-  let text = response.content as string;
+  const response = await invokeLLM(prompt, { temperature: 0.3 });
+  let text = response.content;
 
   console.log("[AI Service] Raw edit response length:", text.length);
 
@@ -441,8 +436,8 @@ ${latexCode.substring(0, 15000)}
 
 Return ONLY raw HTML, no markdown blocks.`;
 
-  const response = await model.invoke(prompt);
-  let html = response.content as string;
+  const response = await invokeLLM(prompt, { temperature: 0.3 });
+  let html = response.content;
   html = html.replace(/^```html\s*/i, "").replace(/```\s*$/, "");
   return html.trim();
 }

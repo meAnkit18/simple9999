@@ -1,13 +1,7 @@
 import File from "@/models/File";
 import User from "@/models/User";
 import mongoose from "mongoose";
-import { ChatGroq } from "@langchain/groq";
-
-const model = new ChatGroq({
-    apiKey: process.env.GROQ_API_KEY!,
-    model: "llama-3.3-70b-versatile",
-    temperature: 0.2,
-});
+import { invokeLLM } from "./llm-client";
 
 export interface UserProfile {
     fullName: string;
@@ -126,8 +120,8 @@ Extract and return a JSON object with the following structure. If any field is n
 Return ONLY valid JSON, no markdown.`;
 
     try {
-        const response = await model.invoke(prompt);
-        let text = response.content as string;
+        const response = await invokeLLM(prompt, { temperature: 0.2 });
+        let text = response.content;
         text = text.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
 
         const profile = JSON.parse(text) as UserProfile;
