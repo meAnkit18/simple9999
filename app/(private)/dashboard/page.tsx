@@ -4,12 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "@/components/Sidebar";
 import { Logo } from "@/components/Logo";
+import ProfileEditModal from "@/components/ProfileEditModal";
 import {
   Sparkles,
   User,
   FileText,
   Upload,
-  File,
+  File as FileIcon,
   Check,
   Loader2,
   Mail,
@@ -18,7 +19,10 @@ import {
   ExternalLink,
   AlertTriangle,
   CheckCircle2,
-  Trash2
+  Trash2,
+  Pencil,
+  Paperclip,
+  X
 } from "lucide-react";
 
 interface Project {
@@ -41,8 +45,10 @@ interface UserProfile {
   email: string;
   phone: string;
   location: string;
+  linkedin?: string;
+  summary?: string;
   skills: string[];
-  experience: { title: string; company: string; duration: string }[];
+  experience: { title: string; company: string; duration: string; description?: string }[];
   education: { degree: string; institution: string; year: string }[];
   skillsCount: number;
   experienceCount: number;
@@ -61,6 +67,11 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // In-chat file attachment state
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const chatFileInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-resize textarea
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -122,22 +133,64 @@ export default function Dashboard() {
     }
   }
 
+  // Handle file selection for chat
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+      // Filter for PDFs only if needed, though accept attribute handles most
+      const pdfs = newFiles.filter(f => f.type === "application/pdf");
+
+      if (pdfs.length !== newFiles.length) {
+        alert("Only PDF files are supported currently.");
+      }
+
+      setAttachedFiles(prev => [...prev, ...pdfs]);
+    }
+    // Reset input so same file can be selected again if needed
+    if (chatFileInputRef.current) {
+      chatFileInputRef.current.value = "";
+    }
+  }
+
+  // Remove attached file
+  function removeAttachedFile(index: number) {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  }
+
   // Create new resume via chat
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!message.trim() || loading) return;
+    if ((!message.trim() && attachedFiles.length === 0) || loading) return;
 
     setLoading(true);
     try {
+      // Use FormData to send both text and files
+      const formData = new FormData();
+      formData.append("message", message);
+
+      attachedFiles.forEach(file => {
+        formData.append("files", file);
+      });
+
       const res = await fetch("/api/chat", {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: formData, // Send FormData instead of JSON
       });
 
       const data = await res.json();
       if (data.projectId) {
+        // Clear attachments on success
+        setAttachedFiles([]);
+        setMessage("");
+
+        // Refresh files list if we uploaded something
+        if (attachedFiles.length > 0) {
+          loadFiles();
+          // Profile update happens in background, but we can try to reload it
+          setTimeout(() => loadProfile(), 2000);
+        }
+
         router.push(`/editor/${data.projectId}`);
       } else {
         alert(data.error || "Failed to create resume");
@@ -205,6 +258,46 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Delete failed:", err);
       alert("Failed to delete file");
+    }
+  }
+
+  // Save edited profile
+  async function handleSaveProfile(updatedProfile: {
+    fullName: string;
+    email: string;
+    phone: string;
+    location: string;
+    linkedin?: string;
+    summary?: string;
+    skills: string[];
+    experience: { title: string; company: string; duration: string; description?: string }[];
+    education: { degree: string; institution: string; year: string }[];
+  }) {
+    // Construct full profile with computed counts
+    const fullProfile: UserProfile = {
+      ...updatedProfile,
+      skillsCount: updatedProfile.skills.length,
+      experienceCount: updatedProfile.experience.length,
+      educationCount: updatedProfile.education.length,
+      certificationsCount: 0, // Certifications aren't editable yet, keep existing or default to 0
+    };
+
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profile: fullProfile }),
+      });
+      const data = await res.json();
+      if (data.success && data.profile) {
+        setProfile(data.profile);
+      } else {
+        throw new Error(data.error || "Failed to save profile");
+      }
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+      throw err;
     }
   }
 
@@ -301,6 +394,25 @@ export default function Dashboard() {
       focus-within:shadow-lg
     "
                     >
+                      {/* Attached Files Preview */}
+                      {attachedFiles.length > 0 && (
+                        <div className="px-4 pt-4 flex flex-wrap gap-2">
+                          {attachedFiles.map((file, i) => (
+                            <div key={i} className="flex items-center gap-2 bg-accent/50 border border-border/50 rounded-lg px-3 py-1.5 text-sm animate-in fade-in zoom-in-95">
+                              <FileIcon className="w-4 h-4 text-primary" />
+                              <span className="max-w-[150px] truncate">{file.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeAttachedFile(i)}
+                                className="ml-1 p-0.5 hover:bg-red-500/10 hover:text-red-500 rounded-full transition-colors"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
                       <textarea
                         ref={textareaRef}
                         value={message}
@@ -324,45 +436,69 @@ export default function Dashboard() {
         focus:ring-0
         resize-none
         p-4
+        pl-12
         pr-14
         text-lg
         placeholder:text-muted-foreground/50
       "
                       />
 
-                      <button
-                        type="submit"
-                        disabled={loading || !message.trim()}
-                        className="
-        absolute right-2 bottom-2
-        p-2
-        rounded-xl
-        bg-primary
-        text-primary-foreground
-        hover:opacity-90
-        disabled:opacity-50
-        disabled:cursor-not-allowed
-        transition
-      "
-                      >
-                        {loading ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                          <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <line x1="22" y1="2" x2="11" y2="13" />
-                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                          </svg>
-                        )}
-                      </button>
+                      {/* File Attachment Button (Left) */}
+                      <div className="absolute left-2 bottom-2">
+                        <input
+                          type="file"
+                          ref={chatFileInputRef}
+                          onChange={handleFileSelect}
+                          accept=".pdf"
+                          multiple
+                          className="hidden"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => chatFileInputRef.current?.click()}
+                          disabled={loading}
+                          className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-colors"
+                          title="Attach PDF"
+                        >
+                          <Paperclip className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      {/* Send Button (Right) */}
+                      <div className="absolute right-2 bottom-2">
+                        <button
+                          type="submit"
+                          disabled={loading || (!message.trim() && attachedFiles.length === 0)}
+                          className="
+          p-2
+          rounded-xl
+          bg-primary
+          text-primary-foreground
+          hover:opacity-90
+          disabled:opacity-50
+          disabled:cursor-not-allowed
+          transition
+        "
+                        >
+                          {loading ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <line x1="22" y1="2" x2="11" y2="13" />
+                              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </form>
 
@@ -406,10 +542,19 @@ export default function Dashboard() {
                     <p className="text-muted-foreground mt-1">Managed by AI from your documents</p>
                   </div>
                   {hasProfile && (
-                    <span className="flex items-center gap-2 px-3 py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-sm font-medium border border-green-500/20">
-                      <CheckCircle2 className="w-4 h-4" />
-                      Active & Ready
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setIsEditModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors font-medium"
+                      >
+                        <Pencil className="w-4 h-4" />
+                        Edit Profile
+                      </button>
+                      <span className="flex items-center gap-2 px-3 py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-sm font-medium border border-green-500/20">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Active & Ready
+                      </span>
+                    </div>
                   )}
                 </div>
 
@@ -553,7 +698,7 @@ export default function Dashboard() {
                             {f.type === "application/pdf" ? (
                               <FileText className="w-6 h-6" />
                             ) : (
-                              <File className="w-6 h-6" />
+                              <FileIcon className="w-6 h-6" />
                             )}
                           </div>
                           <div>
@@ -600,6 +745,14 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+
+        {/* Profile Edit Modal */}
+        <ProfileEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          profile={profile}
+          onSave={handleSaveProfile}
+        />
       </main>
     </div>
   );

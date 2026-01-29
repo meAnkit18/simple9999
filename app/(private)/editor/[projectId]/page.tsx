@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Paperclip, X, File as FileIcon } from "lucide-react";
 
 export default function EditorPage() {
   const { projectId } = useParams() as { projectId: string };
@@ -17,6 +18,11 @@ export default function EditorPage() {
   const [chatLoading, setChatLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Chat file attachment
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const chatFileInputRef = useRef<HTMLInputElement>(null);
 
   // Toggle between LaTeX and Preview view
   const [activeView, setActiveView] = useState<"latex" | "preview">("preview");
@@ -134,17 +140,46 @@ export default function EditorPage() {
     }
   }
 
+  // Handle file selection for chat
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+      const pdfs = newFiles.filter(f => f.type === "application/pdf");
+
+      if (pdfs.length !== newFiles.length) {
+        alert("Only PDF files are supported currently.");
+      }
+
+      setAttachedFiles(prev => [...prev, ...pdfs]);
+    }
+    if (chatFileInputRef.current) {
+      chatFileInputRef.current.value = "";
+    }
+  }
+
+  // Remove attached file
+  function removeAttachedFile(index: number) {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  }
+
   // Chat to edit LaTeX
   async function sendChat() {
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() && attachedFiles.length === 0) return;
 
     setChatLoading(true);
     try {
+      const formData = new FormData();
+      formData.append("projectId", projectId);
+      formData.append("message", chatInput);
+
+      attachedFiles.forEach(file => {
+        formData.append("files", file);
+      });
+
       const res = await fetch("/api/chat/edit", {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, message: chatInput }),
+        body: formData,
       });
 
       const data = await res.json();
@@ -152,9 +187,10 @@ export default function EditorPage() {
         setLatex(data.latexCode);
         setChatHistory((prev) => [
           ...prev,
-          { role: "user", content: chatInput },
+          { role: "user", content: chatInput + (attachedFiles.length > 0 ? ` [Attached: ${attachedFiles.map(f => f.name).join(", ")}]` : "") },
           { role: "assistant", content: data.summary || "Changes applied." },
         ]);
+        setAttachedFiles([]);
       }
       setChatInput("");
     } catch (err) {
@@ -263,29 +299,70 @@ export default function EditorPage() {
           </div>
 
           <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm">
-            <div className="relative flex items-end gap-2 bg-background border border-input rounded-xl p-2 shadow-sm focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
-              <textarea
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Ask AI to improve your resume..."
-                className="w-full max-h-32 bg-transparent border-none p-2 text-sm resize-none focus:outline-none placeholder:text-muted-foreground/70"
-                rows={1}
-                style={{ minHeight: "44px" }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    sendChat();
-                  }
-                }}
-              />
-              <button
-                onClick={sendChat}
-                disabled={chatLoading || !chatInput.trim()}
-                className="mb-1 p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
-                title="Send message"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-              </button>
+            <div className="relative flex flex-col gap-2 bg-background border border-input rounded-xl p-2 shadow-sm focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
+
+              {/* Attached Files Preview */}
+              {attachedFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 px-1">
+                  {attachedFiles.map((file, i) => (
+                    <div key={i} className="flex items-center gap-2 bg-accent/50 border border-border/50 rounded-lg px-2 py-1 text-xs animate-in fade-in zoom-in-95">
+                      <FileIcon className="w-3 h-3 text-primary" />
+                      <span className="max-w-[100px] truncate">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeAttachedFile(i)}
+                        className="ml-1 p-0.5 hover:bg-red-500/10 hover:text-red-500 rounded-full transition-colors"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex items-end gap-2">
+                {/* File Attachment Button */}
+                <input
+                  type="file"
+                  ref={chatFileInputRef}
+                  onChange={handleFileSelect}
+                  accept=".pdf"
+                  multiple
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => chatFileInputRef.current?.click()}
+                  disabled={chatLoading}
+                  className="mb-1 p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors flex-shrink-0"
+                  title="Attach PDF"
+                >
+                  <Paperclip className="w-4 h-4" />
+                </button>
+
+                <textarea
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask AI to improve your resume..."
+                  className="w-full max-h-32 bg-transparent border-none p-2 text-sm resize-none focus:outline-none placeholder:text-muted-foreground/70"
+                  rows={1}
+                  style={{ minHeight: "44px" }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      sendChat();
+                    }
+                  }}
+                />
+                <button
+                  onClick={sendChat}
+                  disabled={chatLoading || (!chatInput.trim() && attachedFiles.length === 0)}
+                  className="mb-1 p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
+                  title="Send message"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+              </div>
             </div>
             <p className="text-[10px] text-muted-foreground text-center mt-2">
               AI can make mistakes. Please review the changes.
@@ -325,6 +402,34 @@ export default function EditorPage() {
                 <span className="text-xs text-primary animate-pulse">
                   Updating preview...
                 </span>
+              )}
+              {activeView === "latex" && (
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(latex);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  disabled={!latex.trim()}
+                  className="px-3 py-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground disabled:opacity-50 rounded text-xs transition-colors flex items-center gap-1.5"
+                >
+                  {copied ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                      </svg>
+                      Copy LaTeX
+                    </>
+                  )}
+                </button>
               )}
               {activeView === "preview" && (
                 <button
