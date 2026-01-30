@@ -2,154 +2,173 @@ import { UserProfile, formatProfileForAI } from "./user-profile";
 import { invokeLLM } from "./llm-client";
 
 // Professional LaTeX Resume Template
-const LATEX_TEMPLATE = `%-------------------------
-% Resume in Latex
-% Author : Abey George
-% Based off of: https://github.com/sb2nov/resume
-% License : MIT
-%------------------------
+const LATEX_TEMPLATE = String.raw`
+%=================================================
+% Minimal Professional Resume Template
+% Render / Docker / EC2 SAFE
+% ZERO fancy packages
+%=================================================
 
-\\documentclass[letterpaper,11pt]{article}
+\documentclass[letterpaper,11pt]{article}
 
-\\usepackage{latexsym}
-\\usepackage[empty]{fullpage}
-\\usepackage{titlesec}
-\\usepackage{marvosym}
-\\usepackage[usenames,dvipsnames]{color}
-\\usepackage{verbatim}
-\\usepackage{enumitem}
-\\usepackage[hidelinks]{hyperref}
-\\usepackage[english]{babel}
-\\usepackage{tabularx}
-\\usepackage{fontawesome5}
-\\usepackage{multicol}
-\\usepackage{graphicx}
-\\setlength{\\multicolsep}{-3.0pt}
-\\setlength{\\columnsep}{-1pt}
-\\input{glyphtounicode}
+% ===== ONLY SAFE PACKAGES =====
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage[english]{babel}
 
-\\RequirePackage{tikz}
-\\RequirePackage{xcolor}
-\\RequirePackage{fontawesome}
-\\usepackage{tikz}
-\\usetikzlibrary{svg.path}
+%=================================================
+% COLORS (same theme as Aman resume)
+%=================================================
+\definecolor{heading}{rgb}{0.06,0.27,0.22}
+\definecolor{textgray}{rgb}{0.35,0.35,0.35}
 
+%=================================================
+% PAGE LAYOUT
+%=================================================
+\addtolength{\oddsidemargin}{-0.6in}
+\addtolength{\textwidth}{1.2in}
+\addtolength{\topmargin}{-0.7in}
+\addtolength{\textheight}{1.4in}
 
-\\definecolor{cvblue}{HTML}{0E5484}
-\\definecolor{black}{HTML}{130810}
-\\definecolor{darkcolor}{HTML}{0F4539}
-\\definecolor{cvgreen}{HTML}{3BD80D}
-\\definecolor{taggreen}{HTML}{00E278}
-\\definecolor{SlateGrey}{HTML}{2E2E2E}
-\\definecolor{LightGrey}{HTML}{666666}
-\\colorlet{name}{black}
-\\colorlet{tagline}{darkcolor}
-\\colorlet{heading}{darkcolor}
-\\colorlet{headingrule}{cvblue}
-\\colorlet{accent}{darkcolor}
-\\colorlet{emphasis}{SlateGrey}
-\\colorlet{body}{LightGrey}
+\pagestyle{empty}
+\raggedright
+\urlstyle{same}
 
-% Adjust margins
-\\addtolength{\\oddsidemargin}{-0.6in}
-\\addtolength{\\evensidemargin}{-0.5in}
-\\addtolength{\\textwidth}{1.19in}
-\\addtolength{\\topmargin}{-.7in}
-\\addtolength{\\textheight}{1.4in}
+%=================================================
+% SECTION STYLE (NO titlesec)
+%=================================================
+\makeatletter
+\def\section{\@startsection{section}{1}{\z@}
+  {2.5ex}
+  {1ex}
+  {\large\bfseries\color{heading}\scshape}}
+\makeatother
 
-\\urlstyle{same}
-
-\\raggedbottom
-\\raggedright
-\\setlength{\\tabcolsep}{0in}
-
-% Sections formatting
-\\titleformat{\\section}{
-  \\vspace{-4pt}\\scshape\\raggedright\\large\\bfseries
-}{}{0em}{}[\\color{black}\\titlerule \\vspace{-5pt}]
-
-% Ensure that generate pdf is machine readable/ATS parsable
-\\pdfgentounicode=1
-
-%-------------------------
-% Custom commands
-\\newcommand{\\resumeItem}[1]{
-  \\item\\small{
-    {#1 \\vspace{-2pt}}
-  }
+\let\oldsection\section
+\renewcommand{\section}[1]{%
+  \oldsection{#1}
+  \vspace{2pt}
+  \hrule height 0.6pt
+  \vspace{6pt}
 }
 
-\\newcommand{\\classesList}[4]{
-    \\item\\small{
-        {#1 #2 #3 #4 \\vspace{-2pt}}
-  }
+%=================================================
+% CUSTOM COMMANDS
+%=================================================
+
+\newcommand{\resumeItem}[1]{
+  \item {\small #1}
 }
 
-\\newcommand{\\resumeSubheading}[4]{
-  \\vspace{-2pt}\\item
-    \\begin{tabular*}{1.0\\textwidth}[t]{l@{\\extracolsep{\\fill}}r}
-      \\textbf{\\large#1} & \\textbf{\\small #2} \\\\
-      \\textit{\\large#3} & \\textit{\\small #4} \\\\
-      
-    \\end{tabular*}\\vspace{-7pt}
+\newcommand{\resumeSubheading}[4]{
+\item
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+\textbf{#1} & #2 \\
+\textit{#3} & \textit{#4} \\
+\end{tabular*}
 }
 
-\\newcommand{\\resumeSubSubheading}[2]{
-    \\item
-    \\begin{tabular*}{0.97\\textwidth}{l@{\\extracolsep{\\fill}}r}
-      \\textit{\\small#1} & \\textit{\\small #2} \\\\
-    \\end{tabular*}\\vspace{-7pt}
+\newcommand{\resumeProject}[2]{
+\item
+\textbf{#1} \hfill #2
 }
 
-
-\\newcommand{\\resumeProjectHeading}[2]{
-    \\item
-    \\begin{tabular*}{1.001\\textwidth}{l@{\\extracolsep{\\fill}}r}
-      \\small#1 & \\textbf{\\small #2}\\\\
-    \\end{tabular*}\\vspace{-7pt}
+\newcommand{\resumeListStart}{
+\begin{itemize}[leftmargin=0in,label={}]
 }
 
-\\newcommand{\\resumeSubItem}[1]{\\resumeItem{#1}\\vspace{-4pt}}
+\newcommand{\resumeListEnd}{
+\end{itemize}
+}
 
-\\renewcommand\\labelitemi{$\\vcenter{\\hbox{\\tiny$\\bullet$}}$}
-\\renewcommand\\labelitemii{$\\vcenter{\\hbox{\\tiny$\\bullet$}}$}
+\newcommand{\resumeItemListStart}{
+\begin{itemize}[leftmargin=0.2in]
+}
 
-\\newcommand{\\resumeSubHeadingListStart}{\\begin{itemize}[leftmargin=0.0in, label={}]}
-\\newcommand{\\resumeSubHeadingListEnd}{\\end{itemize}}
-\\newcommand{\\resumeItemListStart}{\\begin{itemize}}
-\\newcommand{\\resumeItemListEnd}{\\end{itemize}\\vspace{-5pt}}
+\newcommand{\resumeItemListEnd}{
+\end{itemize}
+}
+
+%=================================================
+% DOCUMENT START
+%=================================================
+\begin{document}
+
+%================ HEADER =================
+\begin{center}
+{\Huge \textbf{Your Name}}\\
+City, State, Country\\
+\small
+Phone: +91-XXXXXXXXXX $|$
+\href{mailto:you@email.com}{you@email.com} $|$
+\href{https://linkedin.com/in/yourid}{LinkedIn} $|$
+\href{https://github.com/yourid}{GitHub}
+\end{center}
+
+%================ EDUCATION =================
+\section{Education}
+\resumeListStart
+\resumeSubheading
+{University Name}{2020--2024}
+{B.Tech Computer Science}{City}
+\resumeListEnd
+
+%================ EXPERIENCE =================
+\section{Experience}
+\resumeListStart
+
+\resumeSubheading
+{Software Developer — Company}{2024--Present}
+{Role}{Location}
+\resumeItemListStart
+\resumeItem{Built scalable backend services using Java and MongoDB}
+\resumeItem{Improved performance by 30\% using optimized algorithms}
+\resumeItemListEnd
+
+\resumeListEnd
+
+%================ PROJECTS =================
+\section{Projects}
+\resumeListStart
+
+\resumeProject
+{\href{https://github.com/yourproject}{Project Name | React, Node, MongoDB}}{2024}
+\resumeItemListStart
+\resumeItem{Developed full-stack application with authentication}
+\resumeItem{Deployed on cloud with CI/CD}
+\resumeItemListEnd
+
+\resumeListEnd
+
+%================ SKILLS =================
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in,label={}]
+\item \small{
+\textbf{Languages:} Java, Python, C++ \\
+\textbf{Frameworks:} React, Node, Express \\
+\textbf{Tools:} Git, Docker, VS Code
+}
+\end{itemize}
+
+%================ CERTIFICATIONS =================
+\section{Certifications}
+\small
+• \href{https://link}{Course Name – Udemy} \\
+• \href{https://link}{Another Certificate}
+
+%================ EXTRACURRICULAR =================
+\section{Extracurricular}
+\resumeListStart
+\resumeItemListStart
+\resumeItem{Participated in hackathons and coding contests}
+\resumeItem{Open-source contributor}
+\resumeItemListEnd
+\resumeListEnd
+
+\end{document}
 
 
-\\newcommand\\sbullet[1][.5]{\\mathbin{\\vcenter{\\hbox{\\scalebox{#1}{$\\bullet$}}}}}
-
-%-------------------------------------------
-%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-\\begin{document}
-
-%----------HEADING----------
-{{HEADING_SECTION}}
-
-%-----------EDUCATION-----------
-{{EDUCATION_SECTION}}
-
-%-----------EXPERIENCE-----------
-{{EXPERIENCE_SECTION}}
-
-%-----------PROJECTS-----------
-{{PROJECTS_SECTION}}
-
-%-----------PROGRAMMING SKILLS-----------
-{{SKILLS_SECTION}}
-
-%-----------CERTIFICATIONS---------------
-{{CERTIFICATIONS_SECTION}}
-
-%-----------EXTRACURRICULAR---------------
-{{EXTRACURRICULAR_SECTION}}
-
-\\end{document}
 `;
 
 const LATEX_SYSTEM = `You are an expert LaTeX resume builder. You MUST use the EXACT template structure provided.
@@ -159,7 +178,7 @@ IMPORTANT RULES:
 2. Keep the same color scheme and formatting (cvblue, darkcolor, etc.)
 3. STRUCTURE: Use \\section{SECTION NAME} followed by \\resumeSubHeadingListStart ...
 4. HELPFUL COMMANDS: Use \\href{url}{text} for links. 
-5. NO LOGOS: DO NOT include image references like \\includegraphics for external images. FontAwesome icons (\\faPhone, \\faGithub, etc.) ARE allowed and encouraged instead of images.
+5. NO ICONS/GRAPHICS: Do NOT use FontAwesome, tikz, svg, or images. Use text labels (e.g., "Phone:", "Email:", "GitHub:") or standard bullets ($\\bullet$).
 6. Make it ATS-friendly and professional
 7. Keep to ONE page if possible
 8. Do NOT use markdown code blocks in output, just raw LaTeX.
@@ -167,6 +186,7 @@ IMPORTANT RULES:
 CRITICAL SPACING RULES (TO PREVENT OVERLAPPING TEXT):
 9. Respect the template's spacing. \\vspace{-7pt} is standard for headings in this template using the custom commands.
 10. Do not add excessive negative vspace manually unless necessary.
+11. OPTIMIZE FOR ROBUSTNESS: Avoid packages like 'enumitem', 'titlesec', 'fontawesome5', 'multicol', 'tikz'. Use standard tabular environments and basic formatting.
 `;
 
 /**
@@ -238,9 +258,9 @@ HEADING SECTION EXAMPLE:
 \\begin{center}
     {\\Huge \\scshape [Full Name]} \\\\ \\vspace{1pt}
     [Location] \\\\ \\vspace{1pt}
-    \\small \\href{tel:#}{\\underline{[Phone]}} $|$ \\href{mailto:[email]}{\\underline{[Email]}} $|$ 
-    \\href{[LinkedIn URL]}{\\underline{LinkedIn}} $|$
-    \\href{[GitHub URL]}{\\underline{Github}}
+    \\small \\href{tel:1234567890}{\\underline{[Phone]}} $|$ \\href{mailto:email@example.com}{\\underline{[Email]}} $|$ 
+    \\href{https://linkedin.com/in/user}{\\underline{LinkedIn}} $|$
+    \\href{https://github.com/user}{\\underline{Github}}
 \\end{center}
 \\vspace{0.5mm}
 
@@ -259,8 +279,8 @@ EXPERIENCE SECTION EXAMPLE:
       {[Job Title] at [Company]}{[Date Range]} 
       {\\underline{Role - [Role Name]}}{[Location]}
       \\resumeItemListStart
-        \\resumeItem{\\normalsize{[Achievement/responsibility with metrics if possible]}}
-        \\resumeItem{\\normalsize{[Another achievement highlighting \\textbf{key technologies}]}}
+        \\resumeItem{[Achievement/responsibility with metrics if possible]}
+        \\resumeItem{[Another achievement highlighting \\textbf{key technologies}]}
       \\resumeItemListEnd  
   \\resumeSubHeadingListEnd
 
@@ -269,35 +289,35 @@ PROJECTS SECTION EXAMPLE:
     \\vspace{-5pt}
     \\resumeSubHeadingListStart
      \\resumeProjectHeading
-          {\\href{[URL]}{\\textbf{\\large{\\underline{[Project Name]}}}} $|$ \\large{\\underline{[Tech Stack]}}}{[Year]}\\\\
+          {\\href{https://project-url.com}{\\textbf{\\large{\\underline{[Project Name]}}}} $|$ \\large{\\underline{[Tech Stack]}}}{[Year]}\\\\
           \\resumeItemListStart
-            \\resumeItem {\\normalsize{[Description of what you built]}}
-            \\resumeItem{\\normalsize{[Impact/features]}}
+            \\resumeItem {[Description of what you built]}
+            \\resumeItem{[Impact/features]}
           \\resumeItemListEnd
     \\resumeSubHeadingListEnd
 
 SKILLS SECTION EXAMPLE:
 \\section{TECHNICAL SKILLS}
- \\begin{itemize}[leftmargin=0.15in, label={}]
+ \\begin{list}{}{\\setlength{\\leftmargin}{0.15in}\\setlength{\\labelwidth}{0pt}}
     \\small{\\item{
      \\textbf{\\normalsize{Languages:}}{  \\normalsize{[Languages]}} \\\\
      \\textbf{\\normalsize{Technologies/Frameworks:}}{  \\normalsize{[Frameworks]}} \\\\
      \\textbf{\\normalsize{Developer Tools:}}{  \\normalsize{[Tools]}} \\\\
     }}
- \\end{itemize}
+ \\end{list}
  \\vspace{-3pt}
 
 CERTIFICATIONS SECTION EXAMPLE:
 \\section{CERTIFICATIONS}
-$\\sbullet[.75] \\hspace{0.1cm}$ {\\href{[URL]}{[Certification Name]}} \\hspace{2.59cm}\\\\
-$\\sbullet[.75] \\hspace{0.1cm}$ {\\href{[URL]}{[Another Certification]}} \\hspace{1.6cm}\\\\
+$\\sbullet \\hspace{0.1cm}$ {\\href{https://cert-url.com}{[Certification Name]}} \\hspace{2.59cm}\\\\
+$\\sbullet \\hspace{0.1cm}$ {\\href{https://cert-url.com}{[Another Certification]}} \\hspace{1.6cm}\\\\
 
 EXTRACURRICULAR SECTION EXAMPLE:
 \\section{EXTRACURRICULAR}
     \\resumeSubHeadingListStart
             \\resumeItemListStart
-                \\resumeItem{\\normalsize{[Activity/Achievement]}}
-                \\resumeItem{\\normalsize{[Another activity]}}
+                \\resumeItem{[Activity/Achievement]}
+                \\resumeItem{[Another activity]}
             \\resumeItemListEnd
     \\resumeSubHeadingListEnd
 
@@ -312,6 +332,18 @@ EXTRACURRICULAR SECTION EXAMPLE:
 5. If there's no GitHub/LinkedIn URL, don't include those links.
 6. DO NOT use \\includegraphics for any external images.
 7. Output ONLY raw LaTeX code, no markdown code blocks.
+8. URL RULES: Always use https:// protocol for all URLs (e.g., \\href{https://...}{...}).
+9. ESCAPE SPECIAL CHARACTERS: You MUST escape the following characters in text content to prevent compilation errors:
+   - & -> \\&
+   - % -> \\%
+   - $ -> \\$
+   - # -> \\#
+   - _ -> \\_
+   - { -> \\{
+   - } -> \\}
+   - ~ -> \\textasciitilde
+   - ^ -> \\textasciicircum
+10. HREF SYNTAX: Always use \\href{url}{text}. Never use empty brackets like \\href{}[text] or \\href{url}[].
 `;
   } else {
     fullPrompt += `NOTE: No personal documents were found. Generate a professional TEMPLATE resume 

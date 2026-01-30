@@ -122,13 +122,29 @@ Return ONLY valid JSON, no markdown.`;
     try {
         const response = await invokeLLM(prompt, { temperature: 0.2 });
         let text = response.content;
-        text = text.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
 
-        const profile = JSON.parse(text) as UserProfile;
-        profile.rawText = rawText;
+        // Robust JSON extraction
+        try {
+            // Find the first outer brace and last outer brace
+            const start = text.indexOf('{');
+            const end = text.lastIndexOf('}');
 
-        console.log("[User Profile] Successfully extracted profile for:", profile.fullName);
-        return profile;
+            if (start !== -1 && end !== -1 && end > start) {
+                const jsonStr = text.substring(start, end + 1);
+                const profile = JSON.parse(jsonStr) as UserProfile;
+                profile.rawText = rawText;
+                console.log("[User Profile] Successfully extracted profile for:", profile.fullName);
+                return profile;
+            } else {
+                // Fallback for when no JSON object is found, though unlikely given prompt
+                console.warn("[User Profile] No JSON object found in LLM response");
+                throw new Error("No JSON found");
+            }
+        } catch (parseError) {
+            console.error("[User Profile] JSON parse error:", parseError);
+            console.log("[User Profile] Raw content that failed to parse:", text);
+            throw parseError;
+        }
     } catch (err) {
         console.error("[User Profile] Failed to extract structured profile:", err);
         // Return a basic profile with just raw text

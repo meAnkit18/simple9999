@@ -115,7 +115,7 @@ export default function Home() {
             {/* Right - Text */}
             <div className="flex-1">
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
-                <TypewriterText text="Company-specific resume customization" speed={40} showCursor />
+                <TypewriterText text="Targeted resume customization" speed={40} showCursor />
               </h3>
               <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
                 Creating a tailored resume for every company is time-consuming and mentally exhausting.
@@ -151,7 +151,43 @@ export default function Home() {
       </section>
 
       {/* Video Section - Above Footer */}
-      <AnimatedVideoSection />
+      <AnimatedVideoSection>
+        <div className="relative w-full h-full flex flex-col items-center justify-center text-center p-8 overflow-hidden group">
+          {/* Abstract Grid Background */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+          <div className="relative z-10 space-y-4 max-w-2xl mx-auto">
+            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm animate-pulse">
+              <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
+              Seek Opportunity
+            </div>
+
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-2">
+              The Future of Hiring is <span className="text-primary">Agentic</span>
+            </h2>
+
+            <p className="text-zinc-400 text-lg md:text-xl max-w-lg mx-auto">
+              We are building the infrastructure for the next generation of recruitment. Join us in shaping the future.
+            </p>
+
+            <div className="pt-6">
+              <button className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-white px-8 font-medium text-black transition-all hover:bg-zinc-200">
+                <span className="mr-2">Watch Vision</span>
+                <svg
+                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 transition-opacity duration-500 group-hover:opacity-10" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </AnimatedVideoSection>
 
       <Footer />
     </div>
