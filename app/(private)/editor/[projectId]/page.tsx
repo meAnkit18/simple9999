@@ -10,7 +10,7 @@ export default function EditorPage() {
   const router = useRouter();
 
   const [latex, setLatex] = useState("");
-  const [previewHtml, setPreviewHtml] = useState("");
+  // const [previewHtml, setPreviewHtml] = useState(""); // Removed in favor of previewUrl
   const [loading, setLoading] = useState(true);
   const [projectName, setProjectName] = useState("");
 
@@ -41,12 +41,25 @@ export default function EditorPage() {
     latestLatexRef.current = latex;
   }, [latex]);
 
+  // Preview URL for PDF
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const [autoFixCount, setAutoFixCount] = useState(0);
+
+  // Clean up object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   // Generate preview function (memoized)
   const generatePreview = useCallback(async (latexCode?: string) => {
     const codeToUse = latexCode || latestLatexRef.current;
     if (!codeToUse.trim()) return;
 
     setPreviewLoading(true);
+    setPreviewError(null);
     try {
       const res = await fetch("/api/preview", {
         method: "POST",
@@ -55,12 +68,23 @@ export default function EditorPage() {
         body: JSON.stringify({ projectId, latexCode: codeToUse }),
       });
 
-      const data = await res.json();
-      if (data.html) {
-        setPreviewHtml(data.html);
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || "Preview generation failed");
       }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+
+      setPreviewUrl(prev => {
+        if (prev) URL.revokeObjectURL(prev);
+        return url;
+      });
+      setAutoFixCount(0);
+
     } catch (err) {
       console.error("Preview failed", err);
+      setPreviewError(err instanceof Error ? err.message : "Failed to generate preview");
     } finally {
       setPreviewLoading(false);
     }
@@ -76,12 +100,11 @@ export default function EditorPage() {
 
         if (project) {
           setLatex(project.latexCode || "");
-          setPreviewHtml(project.previewHtml || "");
           setProjectName(project.name || "");
           setChatHistory(project.chatHistory || []);
 
-          // Auto-generate preview on load if we have LaTeX but no preview
-          if (project.latexCode && !project.previewHtml) {
+          // Auto-generate preview on load if we have LaTeX
+          if (project.latexCode) {
             setTimeout(() => generatePreview(project.latexCode), 500);
           }
         }
@@ -163,14 +186,15 @@ export default function EditorPage() {
   }
 
   // Chat to edit LaTeX
-  async function sendChat() {
-    if (!chatInput.trim() && attachedFiles.length === 0) return;
+  async function sendChat(messageOverride?: string) {
+    const message = messageOverride || chatInput;
+    if (!message.trim() && attachedFiles.length === 0) return;
 
     setChatLoading(true);
     try {
       const formData = new FormData();
       formData.append("projectId", projectId);
-      formData.append("message", chatInput);
+      formData.append("message", message);
 
       attachedFiles.forEach(file => {
         formData.append("files", file);
@@ -187,10 +211,15 @@ export default function EditorPage() {
         setLatex(data.latexCode);
         setChatHistory((prev) => [
           ...prev,
-          { role: "user", content: chatInput + (attachedFiles.length > 0 ? ` [Attached: ${attachedFiles.map(f => f.name).join(", ")}]` : "") },
+          { role: "user", content: message + (attachedFiles.length > 0 ? ` [Attached: ${attachedFiles.map(f => f.name).join(", ")}]` : "") },
           { role: "assistant", content: data.summary || "Changes applied." },
         ]);
         setAttachedFiles([]);
+
+        // If this was an auto-fix, clear the error temporarily to encourage preview
+        if (messageOverride) {
+          setPreviewError(null);
+        }
       }
       setChatInput("");
     } catch (err) {
@@ -199,6 +228,36 @@ export default function EditorPage() {
       setChatLoading(false);
     }
   }
+
+  const handleAutoFix = () => {
+    if (!previewError) return;
+
+    const truncatedError = previewError.length > 1500
+      ? previewError.substring(0, 1500) + "... (error truncated)"
+      : previewError;
+
+    const prompt = `The LaTeX code failed to compile with this error:\n${truncatedError}\n\nPlease fix the syntax errors.`;
+    sendChat(prompt);
+  };
+
+  // Auto-fix effect
+  useEffect(() => {
+    if (previewError && autoFixCount < 1 && !loading && !chatLoading && !previewLoading) {
+      console.log("Triggering auto-fix for error:", previewError);
+      setAutoFixCount(c => c + 1);
+
+      const errorToReport = previewError && previewError.trim().replace(/^Compilation failed:\s*$/, "")
+        ? previewError
+        : "Unknown compilation error. Please check for common LaTeX syntax issues like unclosed environments, missing items in lists, or invalid characters.";
+
+      const truncatedError = errorToReport.length > 1500
+        ? errorToReport.substring(0, 1500) + "... (error truncated)"
+        : errorToReport;
+
+      const prompt = `The LaTeX code failed to compile with this error:\n${truncatedError}\n\nPlease fix the syntax errors.`;
+      sendChat(prompt);
+    }
+  }, [previewError, autoFixCount, loading, chatLoading, previewLoading]);
 
   if (loading) {
     return (
@@ -355,7 +414,7 @@ export default function EditorPage() {
                   }}
                 />
                 <button
-                  onClick={sendChat}
+                  onClick={() => sendChat()}
                   disabled={chatLoading || (!chatInput.trim() && attachedFiles.length === 0)}
                   className="mb-1 p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex-shrink-0"
                   title="Send message"
@@ -476,15 +535,38 @@ export default function EditorPage() {
                     </div>
                   </div>
                 )}
-                {previewHtml ? (
+                {previewUrl ? (
                   <iframe
-                    srcDoc={previewHtml}
+                    src={previewUrl}
                     className="w-full h-full border-0"
                     title="Resume Preview"
                   />
                 ) : (
-                  <div className="h-full flex items-center justify-center text-muted-foreground">
-                    {latex.trim() ? "Preview will auto-generate..." : "Enter LaTeX code to preview"}
+                  <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-6 text-center">
+                    {previewError ? (
+                      <div className="text-destructive mb-2 max-w-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <p className="font-medium text-sm">Preview Generation Failed</p>
+                        <p className="text-xs opacity-90 mt-1 bg-destructive/10 p-2 rounded text-left overflow-auto max-h-32 font-mono">{previewError}</p>
+                        <div className="flex gap-2 justify-center mt-3">
+                          <button
+                            onClick={() => generatePreview()}
+                            className="px-3 py-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground text-xs rounded transition-colors"
+                          >
+                            Try Again
+                          </button>
+                          <button
+                            onClick={handleAutoFix}
+                            disabled={chatLoading}
+                            className="px-3 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                          >
+                            {chatLoading ? "Fixing..." : "Auto-Fix with AI"}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>{latex.trim() ? "Preview will auto-generate..." : "Enter LaTeX code to preview"}</>
+                    )}
                   </div>
                 )}
               </div>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getUserIdWithFallback } from "@/lib/auth";
-import { generatePreview } from "@/lib/ai-service";
+import { compileLatex } from "@/lib/tectonic-client"; // Use the new client
 import Project from "@/models/Project";
 
 export async function POST(req: NextRequest) {
@@ -43,21 +43,31 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Generate HTML preview from LaTeX
-        const html = await generatePreview(latexToPreview);
+        // Compile LaTeX to PDF using Tectonic service
+        const pdfBuffer = await compileLatex(latexToPreview);
 
-        // Optionally cache the preview if we have a project
+        // Optionally update the timestamp if we have a project
+        // Note: We are NO LONGER saving previewHtml as it is now a PDF generated on demand
         if (project && projectId) {
-            project.previewHtml = html;
             project.lastModified = new Date();
             await project.save();
         }
 
-        return NextResponse.json({ html });
+        // Return the PDF
+        return new NextResponse(new Uint8Array(pdfBuffer), {
+            headers: {
+                "Content-Type": "application/pdf",
+                "Content-Disposition": "inline; filename=preview.pdf",
+            },
+        });
+
     } catch (error) {
         console.error("Preview error:", error);
+        // If it's a compilation error, it might be useful to return the details
+        const errorMessage = error instanceof Error ? error.message : "Failed to generate preview";
+
         return NextResponse.json(
-            { error: "Failed to generate preview" },
+            { error: errorMessage },
             { status: 500 }
         );
     }
