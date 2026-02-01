@@ -18,16 +18,16 @@ export function Footer() {
                             <ul className="flex flex-col gap-3 text-muted-foreground">
                                 {/* <li><a href="#" className="hover:text-foreground transition-colors">Download</a></li> */}
                                 <li><a href="https://github.com/meAnkit18/simple9999" className="hover:text-foreground transition-colors">Github</a></li>
-                                <li><a href="#" className="hover:text-foreground transition-colors">Docs</a></li>
-                                <li><a href="#" className="hover:text-foreground transition-colors">Changelog</a></li>
+                                <li><a href="https://www.linkedin.com/in/meankit18/" className="hover:text-foreground transition-colors">LinkedIn</a></li>
+                                <li><a href="https://x.com/meAnkit18" className="hover:text-foreground transition-colors">x.com</a></li>
                             </ul>
                         </div>
                         <div className="flex flex-col gap-4">
                             <h3 className="font-medium text-lg">Resources</h3>
                             <ul className="flex flex-col gap-3 text-muted-foreground">
-                                <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
-                                <li><a href="#" className="hover:text-foreground transition-colors">Pricing</a></li>
-                                <li><a href="#" className="hover:text-foreground transition-colors">Use Cases</a></li>
+                                <li><a href="/docs" className="hover:text-foreground transition-colors">Docs</a></li>
+                                <li><a href="/pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
+                                <li><a href="/changelog" className="hover:text-foreground transition-colors">Changelog</a></li>
                             </ul>
                         </div>
                     </div>
@@ -51,10 +51,10 @@ export function Footer() {
                     </div>
 
                     <div className="flex gap-6">
-                        <a href="#" className="hover:text-foreground transition-colors">About Simple9999</a>
-                        <a href="#" className="hover:text-foreground transition-colors">Products</a>
-                        <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-                        <a href="#" className="hover:text-foreground transition-colors">Terms</a>
+                        <a href="/disclaimer" className="hover:text-foreground transition-colors">Disclaimer</a>
+                        {/* <a href="#" className="hover:text-foreground transition-colors">Products</a> */}
+                        <a href="/privacy" className="hover:text-foreground transition-colors">Privacy</a>
+                        <a href="/terms" className="hover:text-foreground transition-colors">Terms</a>
                     </div>
                 </div>
             </div>

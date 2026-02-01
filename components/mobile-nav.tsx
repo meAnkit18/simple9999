@@ -76,21 +76,21 @@ export function MobileNav() {
                                         Features
                                     </Link>
                                     <Link
-                                        href="#pricing"
+                                        href="/pricing"
                                         className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         Pricing
                                     </Link>
                                     <Link
-                                        href="#resources"
+                                        href="/developer"
                                         className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         Developer
                                     </Link>
                                     <Link
-                                        href="/blog"
+                                        href="/docs"
                                         className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2"
                                         onClick={() => setIsOpen(false)}
                                     >

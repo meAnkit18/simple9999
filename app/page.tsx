@@ -10,8 +10,9 @@ import { TypewriterText } from "@/components/ui/typewriter-text";
 import { ScatteredDocumentVisual } from "@/components/ui/scattered-document-visual";
 import { ResumeCustomizationVisual } from "@/components/ui/resume-customization-visual";
 import { ATSScoreVisual } from "@/components/ui/ats-score-visual";
+import { UseCasesSection } from "@/components/UseCasesSection";
 import { FeedbackForm } from "@/components/ui/feedback-form";
-import { MobileNav } from "@/components/mobile-nav";
+import { SiteHeader } from "@/components/SiteHeader";
 
 
 export default function Home() {
@@ -21,39 +22,12 @@ export default function Home() {
 
       </div>
 
+      <div className="fixed inset-0 -z-10">
+      </div>
+
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 md:px-6 py-3 md:py-4 w-full bg-background/50 backdrop-blur-md border-b border-border/10 supports-[backdrop-filter]:bg-background/20">
-        <div className="flex items-center gap-2">
-          <Logo className="h-6 w-6 md:h-8 md:w-8 text-primary" />
-          <span className="text-lg md:text-xl font-bold tracking-tight">Simple9999.com</span>
-        </div>
+      <SiteHeader />
 
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <Link href="#features" className="hover:text-foreground transition-colors">Features</Link>
-          <Link href="#pricing" className="hover:text-foreground transition-colors">Pricing</Link>
-          <Link href="#resources" className="hover:text-foreground transition-colors">Developer</Link>
-          <Link href="/blog" className="hover:text-foreground transition-colors">Docs</Link>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-4">
-            <ThemeToggle />
-            <Link
-              href="/login"
-              className="hidden sm:block text-sm font-medium hover:text-primary transition-colors"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20"
-            >
-              Get Started
-            </Link>
-          </div>
-          <MobileNav />
-        </div>
-      </nav>
 
 
       {/* Hero Section */}
@@ -63,7 +37,7 @@ export default function Home() {
         <div className="relative z-10 flex flex-col items-center justify-center text-center pointer-events-none select-none mt-16 md:mt-0">
           <div className="flex items-center gap-3 mb-4 md:mb-6 animate-fade-in opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
             <Logo className="w-8 h-8 md:w-12 md:h-12 text-primary" />
-            <span className="text-xl md:text-3xl font-bold tracking-tight">simple9999.com</span>
+            <span className="text-xl md:text-3xl font-bold tracking-tight">Simple9999.com</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/50 animate-fade-in-up opacity-0" style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}>
@@ -100,10 +74,10 @@ export default function Home() {
       </AnimatedVideoSection>
 
       {/* Tagline Section */}
-      <section className="w-full px-6 py-16 md:py-32">
+      <section id="features" className="w-full px-6 py-16 md:py-32">
         <div className="max-w-[1400px] mx-auto text-left">
           <h2 className="text-2xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-            <TypewriterText text="Simple9999 is agentic Resume builder website," speed={40} showCursor />
+            <TypewriterText text="Agentic Resume builder website," speed={40} showCursor />
             <br />
             <span className="text-muted-foreground">
               <TypewriterText text="Just by pasting job requirements" speed={40} delay={2000} showCursor />
@@ -174,6 +148,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Use Cases Section */}
+      <UseCasesSection />
 
       {/* Video Section - Above Footer */}
       <AnimatedVideoSection>
