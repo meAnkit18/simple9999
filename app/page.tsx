@@ -84,13 +84,15 @@ export default function Home() {
       {/* Video Section */}
       <AnimatedVideoSection>
         <video
-          src="/videos/Video1.mp4"
           className="w-full h-full object-cover rounded-4xl"
           autoPlay
           muted
           loop
           playsInline
-        />
+        >
+          <source src="/videos/VIdeo1_converted.webm" type="video/webm" />
+          <source src="/videos/VIdeo1_converted.mp4" type="video/mp4" />
+        </video>
       </AnimatedVideoSection>
 
       {/* Tagline Section */}
