@@ -245,7 +245,7 @@ export function ScatteredDocumentVisual({ className }: { className?: string }) {
     return (
         <div className={`w-full h-full min-h-[300px] ${className}`}>
             <Canvas
-                camera={{ position: [0, 0, 42], fov: 75 }}
+                camera={{ position: [0, 0, 70], fov: 75 }}
                 gl={{ antialias: true, alpha: true }}
             >
                 <FloatingDocument />

@@ -61,7 +61,7 @@ const pricingTiers = [
 
 export function PricingSection() {
     return (
-        <section id="pricing" className="w-full px-6 py-24 md:py-32 relative overflow-hidden">
+        <section id="pricing" className="w-full px-4 py-16 md:px-6 md:py-24 relative overflow-hidden">
             <div className="max-w-[1400px] mx-auto relative z-10">
                 <div className="text-center mb-16 md:mb-24">
                     <motion.h2

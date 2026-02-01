@@ -35,7 +35,7 @@ export function AnimatedResumeSection() {
     }, []);
 
     return (
-        <section ref={sectionRef} className="w-full px-6 py-16">
+        <section ref={sectionRef} className="w-full px-4 md:px-6 py-12 md:py-16">
             <div className="max-w-[1400px] mx-auto">
                 <div
                     className="flex flex-col md:flex-row gap-8 items-center justify-center transition-transform duration-100 ease-out"

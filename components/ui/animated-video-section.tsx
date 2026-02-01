@@ -36,7 +36,7 @@ export function AnimatedVideoSection({ children }: AnimatedVideoSectionProps) {
     }, []);
 
     return (
-        <section ref={sectionRef} className="w-full px-6 py-16">
+        <section ref={sectionRef} className="w-full px-4 md:px-6 py-12 md:py-16">
             <div className="max-w-[1400px] mx-auto">
                 <div
                     className="w-full aspect-video rounded-4xl bg-muted/90 flex items-center justify-center transition-transform duration-100 ease-out"

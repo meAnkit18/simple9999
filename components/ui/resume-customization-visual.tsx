@@ -168,7 +168,7 @@ function MultipleResumes() {
 export function ResumeCustomizationVisual({ className }: { className?: string }) {
     return (
         <div className={`w-full h-full min-h-[300px] ${className}`}>
-            <Canvas camera={{ position: [0, 0, 50], fov: 75 }} gl={{ antialias: true, alpha: true }}>
+            <Canvas camera={{ position: [0, 0, 60], fov: 75 }} gl={{ antialias: true, alpha: true }}>
                 <MultipleResumes />
             </Canvas>
         </div>
