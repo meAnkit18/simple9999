@@ -72,6 +72,8 @@ export default function Dashboard() {
   // In-chat file attachment state
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const chatFileInputRef = useRef<HTMLInputElement>(null);
+  const [isDraggingChat, setIsDraggingChat] = useState(false);
+  const [isDraggingUpload, setIsDraggingUpload] = useState(false);
 
   // Auto-resize textarea
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -157,6 +159,39 @@ export default function Dashboard() {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   }
 
+  // Chat drag and drop handlers
+  const handleChatDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingChat(true);
+  };
+
+  const handleChatDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    setIsDraggingChat(false);
+  };
+
+  const handleChatDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingChat(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const newFiles = Array.from(e.dataTransfer.files);
+      const pdfs = newFiles.filter(f => f.type === "application/pdf");
+
+      if (pdfs.length !== newFiles.length) {
+        alert("Only PDF files are supported currently.");
+      }
+
+      if (pdfs.length > 0) {
+        setAttachedFiles(prev => [...prev, ...pdfs]);
+      }
+    }
+  };
+
   // Create new resume via chat
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -204,8 +239,7 @@ export default function Dashboard() {
   }
 
   // Upload document
-  async function uploadFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+  async function processFileUpload(file: File) {
     if (!file) return;
 
     setUploading(true);
@@ -232,9 +266,45 @@ export default function Dashboard() {
       alert("Upload failed");
     } finally {
       setUploading(false);
-      e.target.value = "";
     }
   }
+
+  async function uploadFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      await processFileUpload(file);
+    }
+    e.target.value = "";
+  }
+
+  // Upload zone drag handlers
+  const handleUploadDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingUpload(true);
+  };
+
+  const handleUploadDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    setIsDraggingUpload(false);
+  };
+
+  const handleUploadDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingUpload(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        alert("Only PDF files are supported currently.");
+        return;
+      }
+      await processFileUpload(file);
+    }
+  };
 
   // Delete document
   async function deleteFile(fileId: string, fileName: string) {
@@ -375,14 +445,20 @@ export default function Dashboard() {
                     </div>
                   </form> */}
 
-                  <form onSubmit={handleSubmit} className="relative group">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="relative group"
+                    onDragOver={handleChatDragOver}
+                    onDragLeave={handleChatDragLeave}
+                    onDrop={handleChatDrop}
+                  >
 
                     {/* soft hover glow only */}
                     <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary/20 to-purple-500/20 blur opacity-0 group-hover:opacity-30 transition duration-500 pointer-events-none" />
 
                     {/* input container */}
                     <div
-                      className="
+                      className={`
       relative
       bg-card
       rounded-2xl
@@ -391,9 +467,22 @@ export default function Dashboard() {
       transition-all duration-200
 
       focus-within:border-primary/40
-      focus-within:shadow-lg
-    "
+      active:scale-95
+      ${isDraggingChat ? "border-primary shadow-lg bg-primary/5" : ""}
+    `}
                     >
+                      {/* Drag Overlay */}
+                      {isDraggingChat && (
+                        <div className="absolute inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center rounded-2xl border-2 border-dashed border-primary">
+                          <div className="flex flex-col items-center gap-2 animate-in fade-in zoom-in-95">
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                              <FileIcon className="w-6 h-6 text-primary" />
+                            </div>
+                            <p className="font-medium text-foreground">Drop PDF files here</p>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Attached Files Preview */}
                       {attachedFiles.length > 0 && (
                         <div className="px-4 pt-4 flex flex-wrap gap-2">
@@ -658,7 +747,12 @@ export default function Dashboard() {
                 </div>
 
                 {/* Upload Zone */}
-                <div className="mb-8">
+                <div
+                  className="mb-8 relative"
+                  onDragOver={handleUploadDragOver}
+                  onDragLeave={handleUploadDragLeave}
+                  onDrop={handleUploadDrop}
+                >
                   <label className="block w-full cursor-pointer group">
                     <input
                       type="file"
@@ -667,7 +761,13 @@ export default function Dashboard() {
                       disabled={uploading}
                       className="hidden"
                     />
-                    <div className="border-2 border-dashed border-border rounded-2xl p-12 text-center transition-all duration-300 group-hover:border-primary/50 group-hover:bg-primary/5">
+                    <div className={`
+                      border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300
+                      ${isDraggingUpload
+                        ? "border-primary bg-primary/10 scale-[1.02]"
+                        : "border-border group-hover:border-primary/50 group-hover:bg-primary/5"
+                      }
+                    `}>
                       <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                         {uploading ? (
                           <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -676,7 +776,7 @@ export default function Dashboard() {
                         )}
                       </div>
                       <h3 className="text-lg font-semibold mb-2">
-                        {uploading ? "Processing Document..." : "Click to Upload PDF"}
+                        {uploading ? "Processing Document..." : (isDraggingUpload ? "Drop PDF to Upload" : "Click to Upload PDF")}
                       </h3>
                       <p className="text-muted-foreground max-w-sm mx-auto">
                         Upload LinkedIn profiles, resumes, or cover letters. We'll extract the text automatically.
@@ -746,7 +846,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Profile Edit Modal */}
         <ProfileEditModal
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}

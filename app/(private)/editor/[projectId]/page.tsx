@@ -23,6 +23,7 @@ export default function EditorPage() {
   // Chat file attachment
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const chatFileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Toggle between LaTeX and Preview view
   const [activeView, setActiveView] = useState<"latex" | "preview">("preview");
@@ -185,6 +186,42 @@ export default function EditorPage() {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   }
 
+  // Drag and drop handlers
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Only set to false if we're actually leaving the container, not just entering a child
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const newFiles = Array.from(e.dataTransfer.files);
+      const pdfs = newFiles.filter(f => f.type === "application/pdf");
+
+      if (pdfs.length !== newFiles.length) {
+        alert("Only PDF files are supported currently.");
+      }
+
+      if (pdfs.length > 0) {
+        setAttachedFiles(prev => [...prev, ...pdfs]);
+      }
+    }
+  }, []);
+
   // Chat to edit LaTeX
   async function sendChat(messageOverride?: string) {
     const message = messageOverride || chatInput;
@@ -295,7 +332,22 @@ export default function EditorPage() {
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Chat */}
-        <div className="w-1/3 border-r border-border flex flex-col bg-muted/10 backdrop-blur-sm">
+        <div
+          className="w-1/3 border-r border-border flex flex-col bg-muted/10 backdrop-blur-sm relative transition-colors"
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          {isDragging && (
+            <div className="absolute inset-0 z-50 bg-primary/10 border-2 border-dashed border-primary flex items-center justify-center backdrop-blur-[1px]">
+              <div className="bg-background p-4 rounded-xl shadow-lg border border-border flex flex-col items-center gap-2 animate-in fade-in zoom-in-95">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <FileIcon className="w-6 h-6 text-primary" />
+                </div>
+                <p className="font-medium text-foreground">Drop PDF files here</p>
+              </div>
+            </div>
+          )}
           <div className="p-4 border-b border-border flex items-center justify-between bg-card/50">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">

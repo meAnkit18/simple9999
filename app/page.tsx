@@ -82,7 +82,16 @@ export default function Home() {
       </main>
 
       {/* Video Section */}
-      <AnimatedVideoSection />
+      <AnimatedVideoSection>
+        <video
+          src="/videos/Video1.mp4"
+          className="w-full h-full object-cover rounded-4xl"
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+      </AnimatedVideoSection>
 
       {/* Tagline Section */}
       <section className="w-full px-6 py-24 md:py-32">
