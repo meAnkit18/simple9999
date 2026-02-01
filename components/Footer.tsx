@@ -17,7 +17,7 @@ export function Footer() {
                             <h3 className="font-medium text-lg">Product</h3>
                             <ul className="flex flex-col gap-3 text-muted-foreground">
                                 {/* <li><a href="#" className="hover:text-foreground transition-colors">Download</a></li> */}
-                                <li><a href="#" className="hover:text-foreground transition-colors">Product</a></li>
+                                <li><a href="https://github.com/meAnkit18/simple9999" className="hover:text-foreground transition-colors">Github</a></li>
                                 <li><a href="#" className="hover:text-foreground transition-colors">Docs</a></li>
                                 <li><a href="#" className="hover:text-foreground transition-colors">Changelog</a></li>
                             </ul>

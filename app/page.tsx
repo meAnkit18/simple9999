@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TextReveal } from "@/components/ui/text-reveal";
-import { MagneticButton } from "@/components/ui/magnetic-button";
+import { MagicButton } from "@/components/ui/magic-button";
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/Logo";
 import { WaterDotsBackground } from "@/components/ui/water-dots-background";
@@ -10,6 +10,7 @@ import { TypewriterText } from "@/components/ui/typewriter-text";
 import { ScatteredDocumentVisual } from "@/components/ui/scattered-document-visual";
 import { ResumeCustomizationVisual } from "@/components/ui/resume-customization-visual";
 import { ATSScoreVisual } from "@/components/ui/ats-score-visual";
+import { FeedbackForm } from "@/components/ui/feedback-form";
 
 
 export default function Home() {
@@ -29,8 +30,8 @@ export default function Home() {
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
           <Link href="#features" className="hover:text-foreground transition-colors">Features</Link>
           <Link href="#pricing" className="hover:text-foreground transition-colors">Pricing</Link>
-          <Link href="#resources" className="hover:text-foreground transition-colors">Resources</Link>
-          <Link href="/blog" className="hover:text-foreground transition-colors">Blog</Link>
+          <Link href="#resources" className="hover:text-foreground transition-colors">Developer</Link>
+          <Link href="/blog" className="hover:text-foreground transition-colors">Docs</Link>
         </div>
 
         <div className="flex items-center gap-4">
@@ -62,12 +63,21 @@ export default function Home() {
           </div>
 
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/50 animate-fade-in-up opacity-0" style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}>
-            Vibe Agentic Simplicity
+            Agentic Resume Builder
+          </h1><br />
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/50 animate-fade-in-up opacity-0" style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}>
+            with Simplicity
           </h1>
 
           <p className="mt-6 text-xl md:text-2xl text-muted-foreground max-w-lg mx-auto animate-fade-in-up opacity-0" style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}>
-            Now make your Resumes easily for every job
+            Stop filling forms. Just tell it what you want.
           </p>
+
+          <div className="mt-10 animate-fade-in-up opacity-0 pointer-events-auto" style={{ animationDelay: "0.8s", animationFillMode: "forwards" }}>
+            <MagicButton href="/signup" className="w-full md:w-auto">
+              Start Building Now
+            </MagicButton>
+          </div>
         </div>
       </main>
 
@@ -156,35 +166,21 @@ export default function Home() {
           {/* Abstract Grid Background */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
-          <div className="relative z-10 space-y-4 max-w-2xl mx-auto">
-            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm animate-pulse">
+          <div className="relative z-10 space-y-4 max-w-2xl mx-auto w-full">
+            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm animate-pulse mx-auto">
               <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
-              Seek Opportunity
+              Join the Beta
             </div>
 
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-2">
-              The Future of Hiring is <span className="text-primary">Agentic</span>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground dark:text-white mb-2">
+              Help Shape the <span className="text-primary">Future</span>
             </h2>
 
-            <p className="text-zinc-400 text-lg md:text-xl max-w-lg mx-auto">
-              We are building the infrastructure for the next generation of recruitment. Join us in shaping the future.
+            <p className="text-muted-foreground dark:text-zinc-400 text-lg md:text-xl max-w-lg mx-auto mb-8">
+              We value your input. Share your thoughts or feature requests to help us build the perfect tool for you.
             </p>
 
-            <div className="pt-6">
-              <button className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-white px-8 font-medium text-black transition-all hover:bg-zinc-200">
-                <span className="mr-2">Watch Vision</span>
-                <svg
-                  className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 transition-opacity duration-500 group-hover:opacity-10" />
-              </button>
-            </div>
+            <FeedbackForm />
           </div>
         </div>
       </AnimatedVideoSection>
