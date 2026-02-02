@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://simple9999.com
+
+# Sitemaps
+Sitemap: https://simple9999.com/sitemap.xml
