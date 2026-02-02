@@ -8,53 +8,43 @@ import { Paperclip, X, File as FileIcon } from "lucide-react";
 export default function EditorPage() {
   const { projectId } = useParams() as { projectId: string };
   const router = useRouter();
-
   const [latex, setLatex] = useState("");
-  // const [previewHtml, setPreviewHtml] = useState(""); // Removed in favor of previewUrl
   const [loading, setLoading] = useState(true);
   const [projectName, setProjectName] = useState("");
-
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  // Chat file attachment
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const chatFileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-
-  // Toggle between LaTeX and Preview view
   const [activeView, setActiveView] = useState<"latex" | "preview">("preview");
 
   const [chatHistory, setChatHistory] = useState<
     { role: string; content: string }[]
   >([]);
-
-  // Refs for debouncing and tracking latest values
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const latestLatexRef = useRef(latex);
   const isInitialLoadRef = useRef(true);
 
-  // Keep the ref in sync with state
   useEffect(() => {
     latestLatexRef.current = latex;
   }, [latex]);
 
-  // Preview URL for PDF
+  
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [autoFixCount, setAutoFixCount] = useState(0);
 
-  // Clean up object URL on unmount
+  
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
-  // Generate preview function (memoized)
+  
   const generatePreview = useCallback(async (latexCode?: string) => {
     const codeToUse = latexCode || latestLatexRef.current;
     if (!codeToUse.trim()) return;
@@ -91,7 +81,7 @@ export default function EditorPage() {
     }
   }, [projectId]);
 
-  // Load project
+  
   useEffect(() => {
     async function loadProject() {
       try {
@@ -104,7 +94,7 @@ export default function EditorPage() {
           setProjectName(project.name || "");
           setChatHistory(project.chatHistory || []);
 
-          // Auto-generate preview on load if we have LaTeX
+  
           if (project.latexCode) {
             setTimeout(() => generatePreview(project.latexCode), 500);
           }
@@ -120,22 +110,21 @@ export default function EditorPage() {
     loadProject();
   }, [projectId, generatePreview]);
 
-  // Auto-regenerate preview when LaTeX changes (debounced)
+  
   useEffect(() => {
-    // Skip on initial load
+  
     if (isInitialLoadRef.current || !latex.trim()) return;
 
-    // Clear existing timer
+  
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-    // Set new debounce timer (1.5 seconds after user stops typing)
+  
     debounceTimerRef.current = setTimeout(() => {
       generatePreview(latex);
     }, 1500);
 
-    // Cleanup on unmount or before next effect run
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
@@ -143,7 +132,7 @@ export default function EditorPage() {
     };
   }, [latex, generatePreview]);
 
-  // Save LaTeX
+
   async function saveLatex() {
     setSaveLoading(true);
     try {
@@ -164,7 +153,7 @@ export default function EditorPage() {
     }
   }
 
-  // Handle file selection for chat
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
@@ -181,12 +170,12 @@ export default function EditorPage() {
     }
   }
 
-  // Remove attached file
+
   function removeAttachedFile(index: number) {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   }
 
-  // Drag and drop handlers
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -197,7 +186,7 @@ export default function EditorPage() {
     e.preventDefault();
     e.stopPropagation();
 
-    // Only set to false if we're actually leaving the container, not just entering a child
+
     if (e.currentTarget.contains(e.relatedTarget as Node)) return;
 
     setIsDragging(false);
@@ -222,7 +211,7 @@ export default function EditorPage() {
     }
   }, []);
 
-  // Chat to edit LaTeX
+
   async function sendChat(messageOverride?: string) {
     const message = messageOverride || chatInput;
     if (!message.trim() && attachedFiles.length === 0) return;
@@ -253,7 +242,7 @@ export default function EditorPage() {
         ]);
         setAttachedFiles([]);
 
-        // If this was an auto-fix, clear the error temporarily to encourage preview
+
         if (messageOverride) {
           setPreviewError(null);
         }
@@ -277,7 +266,7 @@ export default function EditorPage() {
     sendChat(prompt);
   };
 
-  // Auto-fix effect
+
   useEffect(() => {
     if (previewError && autoFixCount < 1 && !loading && !chatLoading && !previewLoading) {
       console.log("Triggering auto-fix for error:", previewError);
@@ -412,7 +401,6 @@ export default function EditorPage() {
           <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm">
             <div className="relative flex flex-col gap-2 bg-background border border-input rounded-xl p-2 shadow-sm focus-within:ring-1 focus-within:ring-primary focus-within:border-primary transition-all">
 
-              {/* Attached Files Preview */}
               {attachedFiles.length > 0 && (
                 <div className="flex flex-wrap gap-2 px-1">
                   {attachedFiles.map((file, i) => (

@@ -2,7 +2,19 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const PUBLIC_ROUTES = ["/", "/login", "/signup"];
+const PUBLIC_ROUTES = [
+    "/",
+    "/login",
+    "/signup",
+    "/disclaimer",
+    "/docs",
+    "/privacy",
+    "/terms",
+    "/use-cases",
+    "/pricing",
+    "/changelog",
+    "/developer",
+];
 
 export async function proxy(req: NextRequest) {
     const token = req.cookies.get("token")?.value;

@@ -68,8 +68,7 @@ export default function Home() {
           loop
           playsInline
         >
-          <source src="/videos/VIdeo1_converted.webm" type="video/webm" />
-          <source src="/videos/VIdeo1_converted.mp4" type="video/mp4" />
+          <source src="https://res.cloudinary.com/dhrfuos4s/video/upload/v1770005442/VIdeo1_w3v7bq.mp4" type="video/mp4" />
         </video>
       </AnimatedVideoSection>
 

@@ -22,7 +22,8 @@ import {
   Trash2,
   Pencil,
   Paperclip,
-  X
+  X,
+  Book
 } from "lucide-react";
 
 interface Project {
@@ -68,14 +69,10 @@ export default function Dashboard() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  // In-chat file attachment state
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const chatFileInputRef = useRef<HTMLInputElement>(null);
   const [isDraggingChat, setIsDraggingChat] = useState(false);
   const [isDraggingUpload, setIsDraggingUpload] = useState(false);
-
-  // Auto-resize textarea
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -85,7 +82,6 @@ export default function Dashboard() {
     }
   }, [message]);
 
-  // Load projects, files, and profile on mount
   useEffect(() => {
     loadProjects();
     loadFiles();
@@ -134,12 +130,9 @@ export default function Dashboard() {
       setProfileLoading(false);
     }
   }
-
-  // Handle file selection for chat
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
-      // Filter for PDFs only if needed, though accept attribute handles most
       const pdfs = newFiles.filter(f => f.type === "application/pdf");
 
       if (pdfs.length !== newFiles.length) {
@@ -148,18 +141,13 @@ export default function Dashboard() {
 
       setAttachedFiles(prev => [...prev, ...pdfs]);
     }
-    // Reset input so same file can be selected again if needed
     if (chatFileInputRef.current) {
       chatFileInputRef.current.value = "";
     }
   }
-
-  // Remove attached file
   function removeAttachedFile(index: number) {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
   }
-
-  // Chat drag and drop handlers
   const handleChatDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -191,15 +179,12 @@ export default function Dashboard() {
       }
     }
   };
-
-  // Create new resume via chat
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if ((!message.trim() && attachedFiles.length === 0) || loading) return;
 
     setLoading(true);
     try {
-      // Use FormData to send both text and files
       const formData = new FormData();
       formData.append("message", message);
 
@@ -210,19 +195,15 @@ export default function Dashboard() {
       const res = await fetch("/api/chat", {
         method: "POST",
         credentials: "include",
-        body: formData, // Send FormData instead of JSON
+        body: formData,
       });
 
       const data = await res.json();
       if (data.projectId) {
-        // Clear attachments on success
         setAttachedFiles([]);
         setMessage("");
-
-        // Refresh files list if we uploaded something
         if (attachedFiles.length > 0) {
           loadFiles();
-          // Profile update happens in background, but we can try to reload it
           setTimeout(() => loadProfile(), 2000);
         }
 
@@ -238,7 +219,6 @@ export default function Dashboard() {
     }
   }
 
-  // Upload document
   async function processFileUpload(file: File) {
     if (!file) return;
 
@@ -256,7 +236,6 @@ export default function Dashboard() {
       if (data.success) {
         alert(`✅ Uploaded: ${data.file.name}\n${data.chunksStored} text chunks indexed for AI`);
         loadFiles();
-        // Refresh profile after uploading new document
         setTimeout(() => loadProfile(), 1000);
       } else {
         alert(data.error || "Upload failed");
@@ -277,7 +256,6 @@ export default function Dashboard() {
     e.target.value = "";
   }
 
-  // Upload zone drag handlers
   const handleUploadDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -306,7 +284,6 @@ export default function Dashboard() {
     }
   };
 
-  // Delete document
   async function deleteFile(fileId: string, fileName: string) {
     if (!confirm(`Are you sure you want to delete "${fileName}"? This cannot be undone.`)) {
       return;
@@ -320,7 +297,6 @@ export default function Dashboard() {
 
       if (data.success) {
         setFiles(files.filter(f => f.id !== fileId));
-        // Refresh profile if needed, as deleting a file might change the profile context
         setTimeout(() => loadProfile(), 1000);
       } else {
         alert(data.error || "Failed to delete file");
@@ -330,8 +306,6 @@ export default function Dashboard() {
       alert("Failed to delete file");
     }
   }
-
-  // Save edited profile
   async function handleSaveProfile(updatedProfile: {
     fullName: string;
     email: string;
@@ -343,13 +317,12 @@ export default function Dashboard() {
     experience: { title: string; company: string; duration: string; description?: string }[];
     education: { degree: string; institution: string; year: string }[];
   }) {
-    // Construct full profile with computed counts
     const fullProfile: UserProfile = {
       ...updatedProfile,
       skillsCount: updatedProfile.skills.length,
       experienceCount: updatedProfile.experience.length,
       educationCount: updatedProfile.education.length,
-      certificationsCount: 0, // Certifications aren't editable yet, keep existing or default to 0
+      certificationsCount: 0,
     };
 
     try {
@@ -386,7 +359,6 @@ export default function Dashboard() {
       />
 
       <main className="flex-1 flex flex-col h-screen relative overflow-hidden">
-        {/* Top Bar / Mobile Header placeholder if needed, but Sidebar handles mobile toggle */}
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
           <div className="max-w-4xl mx-auto h-full flex flex-col">
@@ -406,44 +378,20 @@ export default function Dashboard() {
                   <p className="text-xl text-muted-foreground">
                     I can help you create resume based on your profile and the job description.
                   </p>
+
+                  <div className="mt-2 flex justify-center">
+                    <a
+                      href="/docs"
+                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full transition-colors"
+                    >
+                      <Book className="w-4 h-4" />
+                      How to use it
+                    </a>
+                  </div>
                 </div>
 
                 {/* Chat Input Area */}
                 <div className="w-full max-w-2xl relative z-10">
-                  {/* <form onSubmit={handleSubmit} className="relative group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-                    <div className="relative bg-card border border-border/50 rounded-2xl shadow-lg transition-all duration-300 focus-within:shadow-xl focus-within:border-primary/50">
-                      <textarea
-                        ref={textareaRef}
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSubmit(e);
-                          }
-                        }}
-                        placeholder="Paste a job description or describe the role..."
-                        className="w-full max-h-48 min-h-[60px] bg-transparent border-none p-4 pr-14 text-lg resize-none focus:ring-0 placeholder:text-muted-foreground/50"
-                        disabled={loading}
-                        rows={1}
-                      />
-                      <button
-                        type="submit"
-                        disabled={loading || !message.trim()}
-                        className="absolute right-2 bottom-2 p-2 bg-primary text-primary-foreground rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                      >
-                        {loading ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                          </svg>
-                        )}
-                      </button>
-                    </div>
-                  </form> */}
 
                   <form
                     onSubmit={handleSubmit}
