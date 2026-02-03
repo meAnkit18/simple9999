@@ -296,3 +296,76 @@ ${latexCode.substring(0, 15000)}
     .replace(/```$/, "")
     .trim();
 }
+
+/* =========================================================
+   ATS SCORE CHECKER
+   ========================================================= */
+
+export interface AtsResult {
+  score: number;
+  strengths: string[];
+  missingKeywords: string[];
+  suggestions: string[];
+}
+
+export async function checkAtsCompatibility(
+  resumeText: string,
+  jobDescription: string
+): Promise<AtsResult> {
+
+  const prompt = `
+You are an expert ATS (Applicant Tracking System) Analyzer.
+Your task is to compare a RESUME against a JOB DESCRIPTION and provide a compatibility score and actionable feedback.
+
+JOB DESCRIPTION:
+${jobDescription.substring(0, 5000)}
+
+RESUME TEXT:
+${resumeText.substring(0, 10000)}
+
+Analyze the match based on:
+1. Keyword matching (Hard skills, Soft skills, Tools)
+2. Experience relevance
+3. Education adjustments (if required)
+
+Return the result in this EXACT JSON format (no markdown, just raw JSON):
+{
+  "score": <number between 0 and 100>,
+  "strengths": ["<strength 1>", "<strength 2>", ...],
+  "missingKeywords": ["<keyword 1>", "<keyword 2>", ...],
+  "suggestions": ["<specific actionable suggestion 1>", "<suggestion 2>", ...]
+}
+
+Be strict but fair. A score above 80 should be hard to get.
+`;
+
+  console.log("[AI] Analyzing ATS Score...");
+
+  try {
+    const res = await invokeLLM(prompt, { temperature: 0.2 });
+    let content = res.content.trim();
+
+    // Clean up markdown code blocks if present
+    content = content.replace(/^```json\s*/i, "").replace(/^```\s*/, "").replace(/```$/, "");
+
+    const result = JSON.parse(content);
+
+    // Validate structure
+    return {
+      score: typeof result.score === 'number' ? result.score : 0,
+      strengths: Array.isArray(result.strengths) ? result.strengths : [],
+      missingKeywords: Array.isArray(result.missingKeywords) ? result.missingKeywords : [],
+      suggestions: Array.isArray(result.suggestions) ? result.suggestions : []
+    };
+
+  } catch (err) {
+    console.error("ATS Check failed:", err);
+    // Return a safe fallback instead of crashing
+    return {
+      score: 0,
+      strengths: [],
+      missingKeywords: [],
+      suggestions: ["Failed to analyze resume. Please try again."]
+    };
+  }
+}

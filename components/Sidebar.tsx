@@ -11,12 +11,13 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
-  Menu
+  Menu,
+  ClipboardCheck
 } from "lucide-react";
 
 interface SidebarProps {
   activeTab: string;
-  setActiveTab: (tab: "create" | "documents" | "profile") => void;
+  setActiveTab: (tab: "create" | "documents" | "profile" | "ats-score") => void;
   onLogout: () => void;
 }
 
@@ -39,6 +40,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }: SidebarPr
   const navItems = [
     { id: "create", label: "New Chat", icon: MessageSquarePlus },
     { id: "documents", label: "Documents", icon: Folder },
+    { id: "ats-score", label: "ATS Score Checker", icon: ClipboardCheck },
     { id: "profile", label: "My Profile", icon: User },
   ] as const;
 

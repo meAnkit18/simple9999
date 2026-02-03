@@ -25,6 +25,7 @@ import {
   X,
   Book
 } from "lucide-react";
+import { AtsScoreChecker } from "@/components/ui/ats-score-checker";
 
 interface Project {
   id: string;
@@ -64,7 +65,7 @@ export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [activeTab, setActiveTab] = useState<"create" | "documents" | "profile">("create");
+  const [activeTab, setActiveTab] = useState<"create" | "documents" | "profile" | "ats-score">("create");
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
@@ -788,6 +789,22 @@ export default function Dashboard() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* ATS Score Checker Tab */}
+            {activeTab === "ats-score" && (
+              <div className="animate-in fade-in zoom-in-95 duration-300">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-3xl font-bold">ATS Score Checker</h2>
+                    <p className="text-muted-foreground mt-1">Check how well your resume matches the job description</p>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <AtsScoreChecker />
                 </div>
               </div>
             )}
