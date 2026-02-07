@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Upload, FileText, X, AlertTriangle, ChevronRight, CheckCircle2, Loader2, Sparkles } from "lucide-react";
 import { ATSScoreGauge } from "./ats-score-gauge";
 
@@ -11,14 +11,68 @@ interface AtsResult {
     suggestions: string[];
 }
 
-export function AtsScoreChecker() {
+interface AtsScoreCheckerProps {
+    projectId?: string;
+    initialJobDescription?: string;
+}
+
+export function AtsScoreChecker({ projectId, initialJobDescription }: AtsScoreCheckerProps) {
     const [file, setFile] = useState<File | null>(null);
-    const [jobDescription, setJobDescription] = useState("");
+    const [jobDescription, setJobDescription] = useState(initialJobDescription || "");
     const [isDragOver, setIsDragOver] = useState(false);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<AtsResult | null>(null);
     const [error, setError] = useState("");
+    const [autoLoading, setAutoLoading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Auto-load resume if projectId is provided
+    useEffect(() => {
+        async function loadProjectResume() {
+            if (!projectId) return;
+
+            setAutoLoading(true);
+            try {
+                // 1. Fetch project to get LaTeX
+                const res = await fetch("/api/projects", { credentials: "include" });
+                const data = await res.json();
+                const project = data.projects?.find((p: any) => p.id === projectId);
+
+                if (!project || !project.latexCode) {
+                    throw new Error("Project not found or empty");
+                }
+
+                // 2. Generate PDF blob
+                const previewRes = await fetch("/api/preview", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ projectId, latexCode: project.latexCode }),
+                });
+
+                if (!previewRes.ok) throw new Error("Failed to generate PDF");
+
+                const blob = await previewRes.blob();
+                const pdfFile = new File([blob], `${project.name || "resume"}.pdf`, { type: "application/pdf" });
+
+                setFile(pdfFile);
+            } catch (err) {
+                console.error("Auto-load failed", err);
+                setError("Failed to automatically load resume. Please upload manually.");
+            } finally {
+                setAutoLoading(false);
+            }
+        }
+
+        loadProjectResume();
+    }, [projectId]);
+
+    // Update state if initialJobDescription changes (e.g. from prop update)
+    useEffect(() => {
+        if (initialJobDescription) {
+            setJobDescription(initialJobDescription);
+        }
+    }, [initialJobDescription]);
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -115,7 +169,12 @@ export function AtsScoreChecker() {
                                     onChange={handleFileSelect}
                                 />
 
-                                {file ? (
+                                {autoLoading ? (
+                                    <div className="flex flex-col items-center justify-center p-4">
+                                        <Loader2 className="w-8 h-8 text-primary animate-spin mb-2" />
+                                        <p className="text-sm text-muted-foreground">Loading from Editor...</p>
+                                    </div>
+                                ) : file ? (
                                     <div className="flex flex-col items-center animate-in zoom-in-95">
                                         <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
                                             <FileText className="w-6 h-6 text-primary" />

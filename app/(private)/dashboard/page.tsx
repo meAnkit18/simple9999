@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Sidebar from "@/components/Sidebar";
 import { Logo } from "@/components/Logo";
 import ProfileEditModal from "@/components/ProfileEditModal";
@@ -58,8 +58,35 @@ interface UserProfile {
   certificationsCount: number;
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const projectIdParam = searchParams.get("projectId") || undefined;
+  // Try getting JD from URL, fallback to sessionStorage if needed (implemented in Editor)
+  const [jobDescriptionParam, setJobDescriptionParam] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (tabParam && ["create", "documents", "profile", "ats-score"].includes(tabParam)) {
+      setActiveTab(tabParam as any);
+    }
+  }, [tabParam]);
+
+  useEffect(() => {
+    // Check URL param first
+    const jdFromUrl = searchParams.get("jobDescription");
+    if (jdFromUrl) {
+      setJobDescriptionParam(jdFromUrl);
+    } else {
+      // Check sessionStorage
+      const jdFromStorage = sessionStorage.getItem("atsJobDescription");
+      if (jdFromStorage) {
+        setJobDescriptionParam(jdFromStorage);
+        // Clear it so it doesn't persist forever
+        sessionStorage.removeItem("atsJobDescription");
+      }
+    }
+  }, [searchParams]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -804,7 +831,10 @@ export default function Dashboard() {
                 </div>
 
                 <div className="mt-6">
-                  <AtsScoreChecker />
+                  <AtsScoreChecker
+                    projectId={projectIdParam}
+                    initialJobDescription={jobDescriptionParam}
+                  />
                 </div>
               </div>
             )}
@@ -819,5 +849,17 @@ export default function Dashboard() {
         />
       </main>
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-screen">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }

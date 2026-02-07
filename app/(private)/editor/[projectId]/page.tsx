@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Paperclip, X, File as FileIcon } from "lucide-react";
+import { Paperclip, X, File as FileIcon, Sparkles } from "lucide-react";
 
 export default function EditorPage() {
   const { projectId } = useParams() as { projectId: string };
@@ -32,19 +32,19 @@ export default function EditorPage() {
     latestLatexRef.current = latex;
   }, [latex]);
 
-  
+
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [autoFixCount, setAutoFixCount] = useState(0);
 
-  
+
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
-  
+
   const generatePreview = useCallback(async (latexCode?: string) => {
     const codeToUse = latexCode || latestLatexRef.current;
     if (!codeToUse.trim()) return;
@@ -81,7 +81,7 @@ export default function EditorPage() {
     }
   }, [projectId]);
 
-  
+
   useEffect(() => {
     async function loadProject() {
       try {
@@ -94,7 +94,7 @@ export default function EditorPage() {
           setProjectName(project.name || "");
           setChatHistory(project.chatHistory || []);
 
-  
+
           if (project.latexCode) {
             setTimeout(() => generatePreview(project.latexCode), 500);
           }
@@ -110,17 +110,17 @@ export default function EditorPage() {
     loadProject();
   }, [projectId, generatePreview]);
 
-  
+
   useEffect(() => {
-  
+
     if (isInitialLoadRef.current || !latex.trim()) return;
 
-  
+
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
 
-  
+
     debounceTimerRef.current = setTimeout(() => {
       generatePreview(latex);
     }, 1500);
@@ -266,6 +266,27 @@ export default function EditorPage() {
     sendChat(prompt);
   };
 
+  async function checkAtsScore() {
+    // 1. Save first to ensure the ATS checker gets the latest version
+    await saveLatex();
+
+    // 2. Try to find a Job Description from chat history (heuristic: first user message)
+    let jobDescription = "";
+    const firstUserMsg = chatHistory.find(m => m.role === "user");
+    if (firstUserMsg) {
+      // Remove any "Attached: ..." suffix if present
+      jobDescription = firstUserMsg.content.split(" [Attached:")[0].trim();
+    }
+
+    // 3. Store in sessionStorage to avoid URL length limits
+    if (jobDescription) {
+      sessionStorage.setItem("atsJobDescription", jobDescription);
+    }
+
+    // 4. Redirect
+    router.push(`/dashboard?tab=ats-score&projectId=${projectId}${jobDescription ? `&jobDescription=${encodeURIComponent(jobDescription.substring(0, 500))}` : ""}`);
+  }
+
 
   useEffect(() => {
     if (previewError && autoFixCount < 1 && !loading && !chatLoading && !previewLoading) {
@@ -308,6 +329,14 @@ export default function EditorPage() {
         </div>
         <div className="flex gap-2 items-center">
           <ThemeToggle />
+          <button
+            onClick={checkAtsScore}
+            className="flex items-center gap-2 px-3 py-1.5 bg-accent hover:bg-accent/80 text-accent-foreground rounded text-sm font-medium transition-colors border border-border"
+            title="Check ATS Score against Job Description"
+          >
+            <Sparkles className="w-4 h-4 text-purple-500" />
+            <span className="hidden sm:inline">Check ATS Score</span>
+          </button>
           <button
             onClick={saveLatex}
             disabled={saveLoading}
