@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TextReveal } from "@/components/ui/text-reveal";
 import { MagicButton } from "@/components/ui/magic-button";
@@ -7,9 +8,7 @@ import { Logo } from "@/components/Logo";
 import { WaterDotsBackground } from "@/components/ui/water-dots-background";
 import { AnimatedVideoSection } from "@/components/ui/animated-video-section";
 import { TypewriterText } from "@/components/ui/typewriter-text";
-import { ScatteredDocumentVisual } from "@/components/ui/scattered-document-visual";
-import { ResumeCustomizationVisual } from "@/components/ui/resume-customization-visual";
-import { ATSScoreVisual } from "@/components/ui/ats-score-visual";
+import { PlaceholderVisual } from "@/components/ui/placeholder-visual";
 import { UseCasesSection } from "@/components/UseCasesSection";
 import { FeedbackForm } from "@/components/ui/feedback-form";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -99,8 +98,13 @@ export default function Home() {
               </p>
             </div>
             {/* Right - Visual */}
-            <div className="flex-1 w-full h-[250px] md:h-[400px]">
-              <ScatteredDocumentVisual />
+            <div className="relative flex-1 w-full h-[250px] md:h-[400px]">
+              <Image
+                src="https://res.cloudinary.com/dhrfuos4s/image/upload/v1770640343/Screenshot_from_2026-02-09_17-56-49_hxgvu3.png"
+                alt="Scattered documents"
+                fill
+                className="object-cover rounded-[32px] border border-muted-foreground/20 shadow-lg"
+              />
             </div>
           </div>
         </div>
@@ -120,8 +124,13 @@ export default function Home() {
               </p>
             </div>
             {/* Left - Visual */}
-            <div className="flex-1 w-full h-[250px] md:h-[400px]">
-              <ResumeCustomizationVisual />
+            <div className="relative flex-1 w-full h-[250px] md:h-[400px]">
+              <Image
+                src="https://res.cloudinary.com/dhrfuos4s/image/upload/v1770640905/Screenshot_from_2026-02-09_17-56-01_d5l9ku.png"
+                alt="Targeted resume customization"
+                fill
+                className="object-cover rounded-[32px] border border-muted-foreground/20 shadow-lg"
+              />
             </div>
           </div>
         </div>
@@ -141,8 +150,13 @@ export default function Home() {
               </p>
             </div>
             {/* Right - Visual */}
-            <div className="flex-1 w-full h-[250px] md:h-[400px]">
-              <ATSScoreVisual />
+            <div className="relative flex-1 w-full h-[250px] md:h-[400px]">
+              <Image
+                src="https://res.cloudinary.com/dhrfuos4s/image/upload/v1770640837/Screenshot_from_2026-02-09_17-56-39_cakxh9.png"
+                alt="ATS Score"
+                fill
+                className="object-cover rounded-[32px] border border-muted-foreground/20 shadow-lg"
+              />
             </div>
           </div>
         </div>
