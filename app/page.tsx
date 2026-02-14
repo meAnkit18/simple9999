@@ -127,17 +127,27 @@ export default function Home() {
   const handleGuestContinue = async () => {
     setLoading(true);
     try {
-      // 1. Ensure session (should exist from upload, but safe to call)
-      const authRes = await fetch("/api/auth/guest", { method: "POST" });
-      if (!authRes.ok) throw new Error("Failed to create guest session");
-
-      // 2. Generate resume
-      // Files are already uploaded and processed into profile. Just send prompt.
-      const chatRes = await fetch("/api/chat", {
+      // 1. Try to generate resume directly (assuming session might exist from upload)
+      let chatRes = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: prompt }),
       });
+
+      // 2. If 401, it means no session exists. Create one and retry.
+      if (chatRes.status === 401) {
+        const authRes = await fetch("/api/auth/guest", { method: "POST" });
+        if (!authRes.ok) throw new Error("Failed to create guest session");
+
+        // Retry chat request linked to new session
+        chatRes = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: prompt }),
+        });
+      }
+
+      if (!chatRes.ok) throw new Error("Failed to generate resume");
 
       const data = await chatRes.json();
 
@@ -194,7 +204,7 @@ export default function Home() {
           </p>
 
           <div className="mt-10 animate-fade-in-up opacity-0 w-full max-w-2xl px-4 relative group" style={{ animationDelay: "0.8s", animationFillMode: "forwards" }}>
-            <div className="relative flex flex-col items-start bg-background/80 dark:bg-zinc-900/50 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/40 focus-within:border-primary shadow-2xl rounded-3xl transition-all duration-300">
+            <div className="relative flex flex-col items-start bg-background/80 dark:bg-zinc-900/50 backdrop-blur-xl border border-primary/20 hover:border-primary/40 shadow-2xl rounded-3xl transition-all duration-300">
 
               {/* File Chips */}
               {attachedFiles.length > 0 && (
@@ -229,7 +239,7 @@ export default function Home() {
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="I need a resume for a Senior Frontend Engineer role at Google. I have 5 years of experience with React..."
-                  className="w-full h-40 md:h-28 py-5 px-6 pr-36 bg-transparent border-none focus:ring-0 resize-none text-lg leading-relaxed placeholder:text-muted-foreground/60 rounded-3xl"
+                  className="w-full h-40 md:h-28 py-5 px-6 pr-36 bg-transparent border-none focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none resize-none text-lg leading-relaxed placeholder:text-muted-foreground/60 rounded-3xl"
                 />
 
                 <div className="absolute right-3 bottom-3 flex items-center gap-2">

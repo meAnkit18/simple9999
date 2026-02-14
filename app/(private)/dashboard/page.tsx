@@ -564,7 +564,11 @@ function DashboardContent() {
         bg-transparent
         border-none
         outline-none
+        focus:border-none
         focus:ring-0
+        focus:outline-none
+        focus-visible:ring-0
+        focus-visible:outline-none
         resize-none
         p-4
         pl-12
