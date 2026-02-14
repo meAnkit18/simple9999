@@ -8,6 +8,7 @@ interface GuestOnboardingModalProps {
     onContinueAsGuest: () => void;
     onSignUp: () => void;
     onLogin: () => void;
+    isLoading?: boolean;
 }
 
 export default function GuestOnboardingModal({
@@ -16,6 +17,7 @@ export default function GuestOnboardingModal({
     onContinueAsGuest,
     onSignUp,
     onLogin,
+    isLoading = false,
 }: GuestOnboardingModalProps) {
     if (!isOpen) return null;
 
@@ -86,15 +88,16 @@ export default function GuestOnboardingModal({
 
                     <button
                         onClick={onContinueAsGuest}
-                        className="w-full group flex items-center justify-between p-4 bg-transparent border border-border/50 rounded-xl hover:bg-accent/30 text-muted-foreground hover:text-foreground transition-all"
+                        disabled={isLoading}
+                        className="w-full group flex items-center justify-between p-4 bg-transparent border border-border/50 rounded-xl hover:bg-accent/30 text-muted-foreground hover:text-foreground transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <div className="flex items-center gap-3">
                             <span className="p-1 bg-muted/20 rounded-lg">
-                                <User className="w-4 h-4" />
+                                {isLoading ? <div className="w-4 h-4 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin" /> : <User className="w-4 h-4" />}
                             </span>
-                            Continue as Guest
+                            {isLoading ? "Setting things up..." : "Continue as Guest"}
                         </div>
-                        <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                        {!isLoading && <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />}
                     </button>
 
                     <p className="text-xs text-center text-muted-foreground mt-4 px-4">

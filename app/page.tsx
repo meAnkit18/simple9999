@@ -172,6 +172,7 @@ export default function Home() {
         onContinueAsGuest={handleGuestContinue}
         onSignUp={() => router.push(`/signup?prompt=${encodeURIComponent(prompt)}`)}
         onLogin={() => router.push(`/login?prompt=${encodeURIComponent(prompt)}`)}
+        isLoading={loading}
       />
 
       {/* Hero Section */}
