@@ -23,7 +23,8 @@ import {
   Pencil,
   Paperclip,
   X,
-  Book
+  Book,
+  AlertCircle
 } from "lucide-react";
 import { AtsScoreChecker } from "@/components/ui/ats-score-checker";
 
@@ -54,6 +55,8 @@ interface UserProfile {
   education: { degree: string; institution: string; year: string }[];
   educationCount: number;
   certificationsCount: number;
+  skillsCount: number;
+  experienceCount: number;
 }
 
 interface AttachedFile {
