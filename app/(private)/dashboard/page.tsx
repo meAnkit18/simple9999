@@ -52,10 +52,15 @@ interface UserProfile {
   skills: string[];
   experience: { title: string; company: string; duration: string; description?: string }[];
   education: { degree: string; institution: string; year: string }[];
-  skillsCount: number;
-  experienceCount: number;
   educationCount: number;
   certificationsCount: number;
+}
+
+interface AttachedFile {
+  id: string; // temporary ID for UI key
+  file: File;
+  status: 'uploading' | 'ready' | 'error';
+  serverId?: string; // ID from backend
 }
 
 function DashboardContent() {
@@ -97,7 +102,7 @@ function DashboardContent() {
   const [profileLoading, setProfileLoading] = useState(false);
   const [hasProfile, setHasProfile] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const chatFileInputRef = useRef<HTMLInputElement>(null);
   const [isDraggingChat, setIsDraggingChat] = useState(false);
   const [isDraggingUpload, setIsDraggingUpload] = useState(false);
@@ -158,6 +163,53 @@ function DashboardContent() {
       setProfileLoading(false);
     }
   }
+
+  const uploadChatFile = async (file: File) => {
+    const tempId = Math.random().toString(36).substr(2, 9);
+
+    setAttachedFiles(prev => [...prev, {
+      id: tempId,
+      file,
+      status: 'uploading'
+    }]);
+
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        credentials: "include",
+        body: fd,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+
+      setAttachedFiles(prev => prev.map(f =>
+        f.id === tempId ? { ...f, status: 'ready', serverId: data.file.id } : f
+      ));
+
+      // Refresh files list and profile in background
+      loadFiles();
+      setTimeout(() => loadProfile(), 1000);
+
+    } catch (err) {
+      console.error(err);
+      setAttachedFiles(prev => prev.map(f =>
+        f.id === tempId ? { ...f, status: 'error' } : f
+      ));
+    }
+  };
+
+  interface AttachedFile {
+    id: string;
+    file: File;
+    status: 'uploading' | 'ready' | 'error';
+    serverId?: string;
+  }
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
@@ -167,15 +219,17 @@ function DashboardContent() {
         alert("Only PDF files are supported currently.");
       }
 
-      setAttachedFiles(prev => [...prev, ...pdfs]);
+      pdfs.forEach(file => uploadChatFile(file));
     }
     if (chatFileInputRef.current) {
       chatFileInputRef.current.value = "";
     }
   }
-  function removeAttachedFile(index: number) {
-    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+
+  function removeAttachedFile(id: string) {
+    setAttachedFiles(prev => prev.filter(f => f.id !== id));
   }
+
   const handleChatDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -203,22 +257,27 @@ function DashboardContent() {
       }
 
       if (pdfs.length > 0) {
-        setAttachedFiles(prev => [...prev, ...pdfs]);
+        pdfs.forEach(file => uploadChatFile(file));
       }
     }
   };
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if ((!message.trim() && attachedFiles.length === 0) || loading) return;
+
+    if (attachedFiles.some(f => f.status === 'uploading')) {
+      alert("Please wait for files to finish uploading.");
+      return;
+    }
 
     setLoading(true);
     try {
       const formData = new FormData();
       formData.append("message", message);
 
-      attachedFiles.forEach(file => {
-        formData.append("files", file);
-      });
+      // Just sending message is enough as files are already analyzed
+      // But we can send IDs if backend needed specific context, current backend uses all profile data
 
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -230,10 +289,6 @@ function DashboardContent() {
       if (data.projectId) {
         setAttachedFiles([]);
         setMessage("");
-        if (attachedFiles.length > 0) {
-          loadFiles();
-          setTimeout(() => loadProfile(), 2000);
-        }
 
         router.push(`/editor/${data.projectId}`);
       } else {
@@ -462,14 +517,22 @@ function DashboardContent() {
                       {/* Attached Files Preview */}
                       {attachedFiles.length > 0 && (
                         <div className="px-4 pt-4 flex flex-wrap gap-2">
-                          {attachedFiles.map((file, i) => (
-                            <div key={i} className="flex items-center gap-2 bg-accent/50 border border-border/50 rounded-lg px-3 py-1.5 text-sm animate-in fade-in zoom-in-95">
-                              <FileIcon className="w-4 h-4 text-primary" />
-                              <span className="max-w-[150px] truncate">{file.name}</span>
+                          {attachedFiles.map((file) => (
+                            <div key={file.id} className={`flex items-center gap-2 border rounded-lg px-3 py-1.5 text-sm animate-in fade-in zoom-in-95 ${file.status === 'error' ? 'bg-red-500/10 border-red-500/50 text-red-500' :
+                              file.status === 'uploading' ? 'bg-primary/5 border-primary/20 text-primary' :
+                                'bg-accent/50 border-border/50'
+                              }`}>
+                              <FileIcon className="w-4 h-4" />
+                              <span className="max-w-[150px] truncate">{file.file.name}</span>
+
+                              {file.status === 'uploading' && <Loader2 className="w-3 h-3 animate-spin ml-1" />}
+                              {file.status === 'ready' && <CheckCircle2 className="w-3 h-3 text-green-500 ml-1" />}
+                              {file.status === 'error' && <AlertCircle className="w-3 h-3 ml-1" />}
+
                               <button
                                 type="button"
-                                onClick={() => removeAttachedFile(i)}
-                                className="ml-1 p-0.5 hover:bg-red-500/10 hover:text-red-500 rounded-full transition-colors"
+                                onClick={() => removeAttachedFile(file.id)}
+                                className="ml-1 p-0.5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors"
                               >
                                 <X className="w-3 h-3" />
                               </button>
