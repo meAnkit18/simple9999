@@ -7,7 +7,7 @@ import { TextReveal } from "@/components/ui/text-reveal";
 import { MagicButton } from "@/components/ui/magic-button";
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/Logo";
-import { WaterDotsBackground } from "@/components/ui/water-dots-background";
+
 import { AnimatedVideoSection } from "@/components/ui/animated-video-section";
 import { TypewriterText } from "@/components/ui/typewriter-text";
 import { PlaceholderVisual } from "@/components/ui/placeholder-visual";
@@ -187,7 +187,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <main className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden px-4">
-        <WaterDotsBackground className="z-0" />
+
 
         <div className="relative z-10 flex flex-col items-center justify-center text-center mt-16 md:mt-0 w-full max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-4 md:mb-6 animate-fade-in opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
@@ -204,6 +204,7 @@ export default function Home() {
           </p>
 
           <div className="mt-10 animate-fade-in-up opacity-0 w-full max-w-2xl px-4 relative group" style={{ animationDelay: "0.8s", animationFillMode: "forwards" }}>
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-zinc-500 to-gray-500 rounded-3xl blur opacity-20 transition duration-1000 group-hover:opacity-40 group-hover:duration-200" />
             <div className="relative flex flex-col items-start bg-background/80 dark:bg-zinc-900/50 backdrop-blur-xl border border-primary/20 hover:border-primary/40 shadow-2xl rounded-3xl transition-all duration-300">
 
               {/* File Chips */}

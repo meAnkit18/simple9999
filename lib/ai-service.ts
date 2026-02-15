@@ -12,47 +12,65 @@ import { invokeLLM } from "./llm-client";
 const LATEX_TEMPLATE = String.raw`
 \documentclass[letterpaper,11pt]{article}
 
-\usepackage[empty]{fullpage}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
 \usepackage[hidelinks]{hyperref}
 \usepackage{tabularx}
+\usepackage{enumitem}
 
-\addtolength{\oddsidemargin}{-0.6in}
-\addtolength{\textwidth}{1.2in}
-\addtolength{\topmargin}{-.7in}
-\addtolength{\textheight}{1.4in}
+\pagestyle{empty}
 
-\setlength{\parindent}{0pt}
+\setlist[itemize]{leftmargin=*}
 
 \begin{document}
 
 % ================= HEADER =================
 \begin{center}
 {\Huge \textbf{FULL NAME}} \\
+\vspace{2mm}
 Location \\
-Email | Phone | Links
+\vspace{1mm}
+\href{mailto:email@example.com}{email@example.com} \ \textbullet \ \href{tel:+1234567890}{+1 234 567 890} \ \textbullet \ \href{https://linkedin.com/in/username}{LinkedIn}
 \end{center}
+
+\vspace{5mm}
 
 % ================= EDUCATION =================
 \section*{Education}
-\begin{itemize}
+\vspace{-2mm}
+\hrule
+\vspace{2mm}
+\begin{itemize}[noitemsep]
 \item \textbf{Institution} \hfill Dates \\
 Degree / Field
 \end{itemize}
 
+\vspace{3mm}
+
 % ================= EXPERIENCE =================
 \section*{Experience}
-\begin{itemize}
+\vspace{-2mm}
+\hrule
+\vspace{2mm}
+\begin{itemize}[noitemsep]
 \item \textbf{Role} \hfill Dates \\
-Company
+\textit{Company}
 \begin{itemize}
 \item Achievement
 \item Achievement
 \end{itemize}
 \end{itemize}
 
+\vspace{3mm}
+
 % ================= PROJECTS =================
 \section*{Projects}
-\begin{itemize}
+\vspace{-2mm}
+\hrule
+\vspace{2mm}
+\begin{itemize}[noitemsep]
 \item \textbf{Project Name} \hfill Tech Stack
 \begin{itemize}
 \item Description
@@ -60,24 +78,17 @@ Company
 \end{itemize}
 \end{itemize}
 
+\vspace{3mm}
+
 % ================= SKILLS =================
 \section*{Technical Skills}
-\begin{itemize}
-\item Languages:
-\item Frameworks:
-\item Tools:
-\end{itemize}
-
-% ================= CERTIFICATIONS =================
-\section*{Certifications}
-\begin{itemize}
-\item Certification
-\end{itemize}
-
-% ================= EXTRACURRICULAR =================
-\section*{Extracurricular}
-\begin{itemize}
-\item Activity
+\vspace{-2mm}
+\hrule
+\vspace{2mm}
+\begin{itemize}[noitemsep]
+\item \textbf{Languages}:
+\item \textbf{Frameworks}:
+\item \textbf{Tools}:
 \end{itemize}
 
 \end{document}
@@ -100,18 +111,23 @@ STRICT RULES
 3. NEVER define \\newcommand.
 4. Every \\item must be inside \\begin{itemize}.
 5. Always close environments.
-6. Do NOT use enumitem, titlesec, tikz, fontawesome, multicol, graphics.
-7. Do NOT use spacing hacks like \\vspace.
-8. Use simple LaTeX only.
+6. Do NOT use fontawesome, tikz, multicol, graphics.
+7. Use \\textbf{} for bold, \\textit{} for italics.
+8. Use \\textbullet for bullet points in text (e.g., between links).
+9. Do NOT use | (pipe) directly in text, use \\textbullet or \\hspace.
+10. Escape special characters: & % $ # _ { } ~ ^
+11. Use 'enumitem' package for lists (already included).
+12. Use \\hrule for section dividers.
 
 =====================
 ALLOWED COMMANDS ONLY
 =====================
 \\section*
-\\textbf \\textit
+\\textbf \\textit \\textbullet
 \\href
-\\begin{itemize} \\item \\end{itemize}
+\\begin{itemize}[noitemsep] \\item \\end{itemize}
 \\begin{tabularx}
+\\vspace \\hspace \\hrule
 \\\\
 
 Nothing else.
@@ -123,13 +139,7 @@ CONTENT RULES
 - Do not invent info
 - Tailor to job description
 - ATS friendly
-- 1 page
-
-=====================
-ESCAPE SPECIAL CHARACTERS
-=====================
-& % $ # _ { } ~ ^
-must be escaped properly.
+- 1 page limit (be concise)
 
 Remember:
 SIMPLE LATEX = ZERO ERRORS
