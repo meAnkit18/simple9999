@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import TrackPage from "@/components/TrackPage";
+import dynamic from "next/dynamic";
+
+const TrackPage = dynamic(() => import("@/components/TrackPage"), {
+  ssr: false,
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,14 +26,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         
-        {/* Analytics (safe placement) */}
         <GoogleAnalytics />
         <TrackPage />
 
