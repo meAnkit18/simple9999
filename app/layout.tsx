@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import TrackPage from "@/components/TrackPage";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,9 +28,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        
+        {/* Analytics (safe placement) */}
+        <GoogleAnalytics />
+        <TrackPage />
+
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -36,6 +42,7 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+
       </body>
     </html>
   );
