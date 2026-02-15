@@ -3,11 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import dynamic from "next/dynamic";
-
-const TrackPage = dynamic(() => import("@/components/TrackPage"), {
-  ssr: false,
-});
+import { Suspense } from "react";
+import TrackPage from "@/components/TrackPage";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        
+
         <GoogleAnalytics />
-        <TrackPage />
+        <Suspense fallback={null}>
+          <TrackPage />
+        </Suspense>
 
         <ThemeProvider
           attribute="class"
