@@ -4,6 +4,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { Logo } from "./Logo";
 import { MobileNav } from "./mobile-nav";
 
+
 export function SiteHeader() {
     return (
         <nav className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 md:px-6 py-3 md:py-4 w-full bg-background/50 backdrop-blur-md border-b border-border/10 supports-[backdrop-filter]:bg-background/20">
@@ -24,6 +25,7 @@ export function SiteHeader() {
             <div className="flex items-center gap-4">
                 <div className="hidden md:flex items-center gap-4">
                     <ThemeToggle />
+
                     <Link
                         href="/login"
                         className="hidden sm:block text-sm font-medium hover:text-primary transition-colors"
