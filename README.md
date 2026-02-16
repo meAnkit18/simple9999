@@ -1,7 +1,3 @@
-# Simple9999 - Agentic Resume Builder
-
-![Simple9999 Banner](/public/icon.svg)
-
 > **Agentic Resume Builder with Simplicity.**
 > Stop filling forms. Just tell it what you want.
 
@@ -31,6 +27,14 @@ Simple9999 is a cutting-edge, AI-powered resume builder designed to take the pai
 - **Authentication:** JWT (Jose)
 - **PDF Generation:** LaTeX (Tectonic)
 - **Utilities:** `pdfreader`, `tesseract.js` (OCR)
+
+## Images
+<img width="1920" height="1080" alt="Screenshot from 2026-02-15 19-07-58" src="https://github.com/user-attachments/assets/ceb190ed-f94f-42b1-bcaa-461e4df91048" />
+<img width="1920" height="1080" alt="Screenshot from 2026-02-15 19-21-53" src="https://github.com/user-attachments/assets/443396d2-3563-4876-bffd-6913dc62e547" />
+<img width="1920" height="1080" alt="Screenshot from 2026-02-15 19-22-26" src="https://github.com/user-attachments/assets/b61d67be-4bdf-4030-8ad7-02b4587943b6" />
+<img width="1920" height="1080" alt="Screenshot from 2026-02-15 19-22-40" src="https://github.com/user-attachments/assets/ceb76bae-60d4-4f81-bb52-73b2d4eb44cb" />
+
+
 
 ## 🚀 Getting Started
 
