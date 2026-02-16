@@ -77,3 +77,11 @@
 2026-02-16T18:37:59.245Z: Setting custom token cookie for user: "695a7f0d44d12f48395dccfa"
 2026-02-16T18:38:00.905Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
 2026-02-16T18:38:01.027Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T19:42:41.280Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T19:42:54.179Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T19:42:54.244Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T19:42:54.357Z: Redirect callback: {"url":"/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T19:43:03.930Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T19:43:04.426Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T19:43:04.458Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T19:43:04.504Z: Redirect callback: {"url":"/dashboard","baseUrl":"http://localhost:3000"}
