@@ -67,12 +67,17 @@ interface AttachedFile {
 }
 
 function DashboardContent() {
+  console.log("DashboardContent rendering");
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const projectIdParam = searchParams.get("projectId") || undefined;
   // Try getting JD from URL, fallback to sessionStorage if needed (implemented in Editor)
   const [jobDescriptionParam, setJobDescriptionParam] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    console.log("Dashboard mounted");
+  }, []);
 
   useEffect(() => {
     if (tabParam && ["create", "documents", "profile", "ats-score"].includes(tabParam)) {

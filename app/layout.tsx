@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import TrackPage from "@/components/TrackPage";
 import SessionProvider from "@/components/SessionProvider";
 
@@ -27,6 +27,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log("RootLayout rendering");
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

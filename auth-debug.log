@@ -1,0 +1,79 @@
+2026-02-16T18:29:23.116Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:24.238Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:24.308Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:24.385Z: Redirect callback: {"url":"/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:25.268Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:28.912Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:29.274Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:29.340Z: SignIn callback started {"user_email":"ankit1842kumar@gmail.com","provider":"google"}
+2026-02-16T18:29:29.341Z: Google User Data: {"name":"Ankit Kumar","email":"ankit1842kumar@gmail.com","image":"https://lh3.googleusercontent.com/a/ACg8ocKmIvqzCeZw29i_nIKpOiPpUbzYfZdIctfb5F6nh4zF8IKyrQas=s96-c"}
+2026-02-16T18:29:29.388Z: User already exists: "ankit1842kumar@gmail.com"
+2026-02-16T18:29:31.023Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:31.119Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:35.371Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:35.400Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:35.436Z: Redirect callback: {"url":"/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:35.771Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:35.821Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:37.597Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:42.628Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:42.952Z: SignIn callback started {"user_email":"ankit1842kumar@gmail.com","provider":"google"}
+2026-02-16T18:29:42.953Z: Google User Data: {"name":"Ankit Kumar","email":"ankit1842kumar@gmail.com","image":"https://lh3.googleusercontent.com/a/ACg8ocKmIvqzCeZw29i_nIKpOiPpUbzYfZdIctfb5F6nh4zF8IKyrQas=s96-c"}
+2026-02-16T18:29:43.029Z: User already exists: "ankit1842kumar@gmail.com"
+2026-02-16T18:29:45.128Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:29:45.243Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:32:50.931Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:32:52.214Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:32:52.439Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:33:47.104Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:33:47.450Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:33:47.662Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:33:49.279Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:33:49.484Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:33:54.084Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:33:54.231Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:34:00.112Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:34:00.140Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:34:00.171Z: Redirect callback: {"url":"/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:34:06.451Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:34:06.869Z: SignIn callback started {"user_email":"ankit1842kumar@gmail.com","provider":"google"}
+2026-02-16T18:34:06.878Z: Google User Data: {"name":"Ankit Kumar","email":"ankit1842kumar@gmail.com","image":"https://lh3.googleusercontent.com/a/ACg8ocKmIvqzCeZw29i_nIKpOiPpUbzYfZdIctfb5F6nh4zF8IKyrQas=s96-c"}
+2026-02-16T18:34:06.956Z: User already exists: "ankit1842kumar@gmail.com"
+2026-02-16T18:34:09.040Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:34:09.130Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:34:36.690Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:34:36.804Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:14.765Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:14.768Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:14.769Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:17.994Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:18.151Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:18.317Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:18.400Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:19.734Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:19.764Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:19.794Z: Redirect callback: {"url":"/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:23.720Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:23.999Z: SignIn callback started {"user_email":"ankit1842kumar@gmail.com","provider":"google"}
+2026-02-16T18:37:24.000Z: Google User Data: {"name":"Ankit Kumar","email":"ankit1842kumar@gmail.com","image":"https://lh3.googleusercontent.com/a/ACg8ocKmIvqzCeZw29i_nIKpOiPpUbzYfZdIctfb5F6nh4zF8IKyrQas=s96-c"}
+2026-02-16T18:37:24.059Z: User already exists: "ankit1842kumar@gmail.com"
+2026-02-16T18:37:24.072Z: Setting custom token cookie for user: "695a7f0d44d12f48395dccfa"
+2026-02-16T18:37:25.219Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:25.410Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:36.777Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:36.959Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:43.073Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:43.847Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:53.341Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:53.397Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:53.425Z: Redirect callback: {"url":"/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:53.732Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:53.762Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:55.335Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:58.922Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:37:59.184Z: SignIn callback started {"user_email":"ankit1842kumar@gmail.com","provider":"google"}
+2026-02-16T18:37:59.185Z: Google User Data: {"name":"Ankit Kumar","email":"ankit1842kumar@gmail.com","image":"https://lh3.googleusercontent.com/a/ACg8ocKmIvqzCeZw29i_nIKpOiPpUbzYfZdIctfb5F6nh4zF8IKyrQas=s96-c"}
+2026-02-16T18:37:59.242Z: User already exists: "ankit1842kumar@gmail.com"
+2026-02-16T18:37:59.245Z: Setting custom token cookie for user: "695a7f0d44d12f48395dccfa"
+2026-02-16T18:38:00.905Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
+2026-02-16T18:38:01.027Z: Redirect callback: {"url":"http://localhost:3000/dashboard","baseUrl":"http://localhost:3000"}
