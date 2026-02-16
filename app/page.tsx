@@ -46,6 +46,11 @@ export default function Home() {
       alert("Please wait for files to finish uploading.");
       return;
     }
+    // Save prompt to localStorage to persist across auth redirect
+    if (prompt.trim()) {
+      localStorage.setItem('hero_prompt', prompt);
+    }
+
     setIsModalOpen(true);
   };
 

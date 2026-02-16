@@ -122,7 +122,39 @@ function DashboardContent() {
     loadProjects();
     loadFiles();
     loadProfile();
+
+    // Check for prompt from Hero section
+    const heroPrompt = localStorage.getItem('hero_prompt');
+    if (heroPrompt) {
+      localStorage.removeItem('hero_prompt');
+      // Determine if we need to auto-create
+      handleAutoCreate(heroPrompt);
+    }
   }, []);
+
+  async function handleAutoCreate(promptText: string) {
+    setLoading(true);
+    setMessage(promptText); // Show it in UI
+    try {
+      const formData = new FormData();
+      formData.append("message", promptText);
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.projectId) {
+        router.push(`/editor/${data.projectId}`);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function loadProjects() {
     try {
@@ -265,8 +297,8 @@ function DashboardContent() {
     }
   };
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(e?: React.FormEvent) {
+    if (e) e.preventDefault();
     if ((!message.trim() && attachedFiles.length === 0) || loading) return;
 
     if (attachedFiles.some(f => f.status === 'uploading')) {
