@@ -137,8 +137,6 @@ export default function Home() {
       <GuestOnboardingModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSignUp={() => router.push(`/signup?prompt=${encodeURIComponent(prompt)}`)}
-        onLogin={() => router.push(`/login?prompt=${encodeURIComponent(prompt)}`)}
         isLoading={loading}
       />
 

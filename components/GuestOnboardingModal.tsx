@@ -6,16 +6,12 @@ import { signIn } from "next-auth/react";
 interface GuestOnboardingModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSignUp: () => void;
-    onLogin: () => void;
     isLoading?: boolean;
 }
 
 export default function GuestOnboardingModal({
     isOpen,
     onClose,
-    onSignUp,
-    onLogin,
     isLoading = false,
 }: GuestOnboardingModalProps) {
     if (!isOpen) return null;
@@ -73,33 +69,6 @@ export default function GuestOnboardingModal({
                         </div>
                     </button>
 
-                    <button
-                        onClick={onSignUp}
-                        className="w-full group flex items-center justify-between p-4 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all font-medium"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="p-1 bg-white/20 rounded-lg">
-                                <UserPlus className="w-4 h-4" />
-                            </span>
-                            Sign Up with Email
-                        </div>
-                    </button>
-
-                    <button
-                        onClick={onLogin}
-                        className="w-full group flex items-center justify-between p-4 bg-transparent border border-border rounded-xl hover:bg-accent/50 transition-all font-medium text-muted-foreground hover:text-foreground"
-                    >
-                        <div className="flex items-center gap-3">
-                            <span className="p-1 bg-primary/10 rounded-lg text-primary">
-                                <LogIn className="w-4 h-4" />
-                            </span>
-                            Log In
-                        </div>
-                    </button>
-
-                    <p className="text-xs text-center text-muted-foreground mt-4 px-4">
-                        By continuing, you agree to our Terms of Service and Privacy Policy.
-                    </p>
                 </div>
             </div>
         </div>
