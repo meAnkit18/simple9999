@@ -75,17 +75,8 @@ export default function Home() {
       });
 
       if (res.status === 401) {
-        // Create guest session
-        await fetch("/api/auth/guest", { method: "POST" });
-        // Retry upload
-        res = await fetch("/api/upload", {
-          method: "POST",
-          body: (() => {
-            const fd = new FormData();
-            fd.append("file", file);
-            return fd;
-          })(),
-        });
+        setIsModalOpen(true);
+        throw new Error("Please login to upload files");
       }
 
       if (!res.ok) throw new Error("Upload failed");
@@ -124,45 +115,7 @@ export default function Home() {
     // Optional: Call delete API if needed, but for guest flow generic cleanup is fine/later
   };
 
-  const handleGuestContinue = async () => {
-    setLoading(true);
-    try {
-      // 1. Try to generate resume directly (assuming session might exist from upload)
-      let chatRes = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: prompt }),
-      });
 
-      // 2. If 401, it means no session exists. Create one and retry.
-      if (chatRes.status === 401) {
-        const authRes = await fetch("/api/auth/guest", { method: "POST" });
-        if (!authRes.ok) throw new Error("Failed to create guest session");
-
-        // Retry chat request linked to new session
-        chatRes = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: prompt }),
-        });
-      }
-
-      if (!chatRes.ok) throw new Error("Failed to generate resume");
-
-      const data = await chatRes.json();
-
-      if (data.projectId) {
-        router.push(`/editor/${data.projectId}`);
-      } else {
-        alert("Failed to generate resume. Please try again.");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colonomrs duration-300 overflow-x-hidden font-sans selection:bg-primary/20">
@@ -179,7 +132,6 @@ export default function Home() {
       <GuestOnboardingModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onContinueAsGuest={handleGuestContinue}
         onSignUp={() => router.push(`/signup?prompt=${encodeURIComponent(prompt)}`)}
         onLogin={() => router.push(`/login?prompt=${encodeURIComponent(prompt)}`)}
         isLoading={loading}
