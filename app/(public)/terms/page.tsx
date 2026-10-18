@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { SiteHeader } from "@/components/SiteHeader";
-import { Footer } from "@/components/Footer";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export default function TermsPage() {
     return (
@@ -74,13 +74,13 @@ export default function TermsPage() {
                         <section>
                             <h2 className="text-2xl font-semibold mb-4">8. Contact Us</h2>
                             <p className="text-muted-foreground leading-relaxed">
-                                If you have any questions about these Terms, please contact us at support@simple9999.com.
+                                If you have any questions about these Terms, please open an issue in our public GitHub repository.
                             </p>
                         </section>
                     </div>
                 </div>
             </main>
-            <Footer />
+            <SiteFooter />
         </>
     );
 }

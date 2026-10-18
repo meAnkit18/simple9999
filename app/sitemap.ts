@@ -8,6 +8,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${SITE_URL}/tools`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${SITE_URL}/about`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/contact`, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/privacy`, changeFrequency: "monthly", priority: 0.3 },
+    { url: `${SITE_URL}/terms`, changeFrequency: "monthly", priority: 0.3 },
   ];
   for (const tool of publicTools) {
     entries.push({

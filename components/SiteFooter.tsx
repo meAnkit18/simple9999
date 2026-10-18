@@ -23,6 +23,8 @@ export function SiteFooter() {
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li><Link href="/tools" className="hover:text-foreground">All tools</Link></li>
               <li><Link href="/tools/agentic-resume-builder" className="hover:text-foreground">Agentic Resume Builder</Link></li>
+              <li><Link href="/about" className="hover:text-foreground">About</Link></li>
+              <li><Link href="/contact" className="hover:text-foreground">Contact</Link></li>
             </ul>
           </div>
           <div>
@@ -41,10 +43,11 @@ export function SiteFooter() {
         </div>
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 text-sm text-muted-foreground md:flex-row">
           <p>© {new Date().getFullYear()} Simple9999. All rights reserved.</p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-6">
+            <Link href="/about" className="hover:text-foreground">About</Link>
+            <Link href="/contact" className="hover:text-foreground">Contact</Link>
             <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-foreground">Terms of Service</Link>
-            <Link href="/disclaimer" className="hover:text-foreground">Disclaimer</Link>
           </div>
         </div>
       </div>

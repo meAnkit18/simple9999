@@ -25,6 +25,9 @@ export const metadata: Metadata = {
   description:
     "Discover practical online tools for documents, productivity, and more. Start with the AI-powered Agentic Resume Builder.",
   metadataBase: new URL("https://simple9999.com"),
+  other: {
+    "google-adsense-account": "ca-pub-4912040667428623",
+  },
 };
 
 export default function RootLayout({

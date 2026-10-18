@@ -1,6 +1,6 @@
 import React from 'react';
 import { SiteHeader } from "@/components/SiteHeader";
-import { Footer } from "@/components/Footer";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export default function PrivacyPage() {
     return (
@@ -67,7 +67,14 @@ export default function PrivacyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">6. Cookies</h2>
+                            <h2 className="text-2xl font-semibold mb-4">6. Advertising and Third-Party Cookies</h2>
+                            <p className="text-muted-foreground leading-relaxed">
+                                We may display advertisements provided by Google AdSense and other advertising partners. These third parties may use cookies and similar technologies to serve ads based on your prior visits to this or other websites. Google's use of advertising cookies enables it and its partners to serve ads based on your visit to our site and/or other sites on the Internet. You may opt out of personalized advertising by visiting Google's Ads Settings, or by visiting www.aboutads.info.
+                            </p>
+                        </section>
+
+                        <section>
+                            <h2 className="text-2xl font-semibold mb-4">7. Cookies</h2>
                             <p className="text-muted-foreground leading-relaxed">
                                 We use cookies and similar tracking technologies to track the activity on our Service and hold certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.
                             </p>
@@ -81,15 +88,15 @@ export default function PrivacyPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-2xl font-semibold mb-4">8. Contact Us</h2>
+                            <h2 className="text-2xl font-semibold mb-4">9. Contact Us</h2>
                             <p className="text-muted-foreground leading-relaxed">
-                                If you have any questions about this Privacy Policy, please contact us at privacy@simple9999.com.
+                                If you have any questions about this Privacy Policy, please open an issue in our public GitHub repository.
                             </p>
                         </section>
                     </div>
                 </div>
             </main>
-            <Footer />
+            <SiteFooter />
         </>
     );
 }
