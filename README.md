@@ -71,6 +71,9 @@ Follow these steps to set up the project locally.
    # Optional: Default user ID for dev mode fallback
    DEV_USER_ID=your_dev_user_id
 
+   # Admin (optional, comma-separated emails)
+   ADMIN_EMAILS=admin@example.com
+
    # AI Services
    GOOGLE_API_KEY=your_google_gemini_api_key
    GROQ_API_KEY=your_groq_api_key

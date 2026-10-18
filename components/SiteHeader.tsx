@@ -21,6 +21,7 @@ export async function SiteHeader() {
       <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
         <Link href="/" className="hover:text-foreground">Home</Link>
         <Link href="/tools" className="hover:text-foreground">Explore Tools</Link>
+        <Link href="/blog" className="hover:text-foreground">Blog</Link>
         <Link href="/tools" className="hover:text-foreground">Categories</Link>
         <form action="/tools" method="get" className="hidden lg:block">
           <input

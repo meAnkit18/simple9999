@@ -22,6 +22,7 @@ export function SiteFooter() {
             <h3 className="text-sm font-semibold">Explore</h3>
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li><Link href="/tools" className="hover:text-foreground">All tools</Link></li>
+              <li><Link href="/blog" className="hover:text-foreground">Blog</Link></li>
               <li><Link href="/tools/agentic-resume-builder" className="hover:text-foreground">Agentic Resume Builder</Link></li>
               <li><Link href="/about" className="hover:text-foreground">About</Link></li>
               <li><Link href="/contact" className="hover:text-foreground">Contact</Link></li>

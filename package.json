@@ -34,6 +34,8 @@
     "pdfreader": "^3.0.8",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.0",
     "tesseract.js": "^7.0.0",
     "three": "^0.182.0",

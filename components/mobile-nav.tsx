@@ -66,6 +66,7 @@ export function MobileNav({ isAuthenticated = false }: { isAuthenticated?: boole
                                 <nav className="flex flex-col space-y-4">
                                     <Link href="/" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Home</Link>
                                     <Link href="/tools" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Explore Tools</Link>
+                                    <Link href="/blog" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Blog</Link>
                                     <Link href="/tools" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Categories</Link>
                                     {isAuthenticated ? (
                                         <Link href="/dashboard" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Dashboard</Link>

@@ -11,6 +11,7 @@ const PUBLIC_ROUTES = [
     "/icon.svg",
     "/about",
     "/contact",
+    "/blog",
     "/login",
     "/signup",
     "/disclaimer",
@@ -26,6 +27,7 @@ const PUBLIC_ROUTES = [
 
 function isPublicPath(pathname: string): boolean {
     if (PUBLIC_ROUTES.includes(pathname)) return true;
+    if (pathname.startsWith("/blog/")) return true;
     // Public tool landing pages derived from the central registry.
     const publicToolPaths = getPublicTools().map((t) => t.canonicalPath);
     if (publicToolPaths.includes(pathname)) return true;

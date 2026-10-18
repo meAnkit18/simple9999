@@ -54,6 +54,11 @@ export const authOptions: NextAuthOptions = {
 
                     if (!existingUser) {
                         log("Creating new user for:", email);
+                        const adminEmails = (process.env.ADMIN_EMAILS || "")
+                            .split(",")
+                            .map((s) => s.trim().toLowerCase())
+                            .filter(Boolean);
+                        const role = adminEmails.includes((email || "").toLowerCase()) ? "admin" : "user";
                         // Create new user
                         // Note: Password is not required for OAuth users (schema updated)
                         existingUser = await User.create({
@@ -61,6 +66,7 @@ export const authOptions: NextAuthOptions = {
                             email,
                             profileData: { image }, // Store image if convenient, or in separate field
                             hasNewUploads: true,
+                            role,
                         });
                         log("User created successfully");
                     } else {

@@ -29,11 +29,18 @@ export async function POST(req: Request) {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        const adminEmails = (process.env.ADMIN_EMAILS || "")
+            .split(",")
+            .map((s) => s.trim().toLowerCase())
+            .filter(Boolean);
+        const role = adminEmails.includes(email.toLowerCase()) ? "admin" : "user";
+
         // Create user
         const user = await User.create({
             name,
             email,
             password: hashedPassword,
+            role,
         });
 
         // Create token
