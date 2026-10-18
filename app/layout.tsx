@@ -18,8 +18,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Simple9999",
-  description: "Agent that makes your resume easily for every job",
+  title: {
+    default: "Simple9999 — Free Online Tools for Everyday Work",
+    template: "%s | Simple9999",
+  },
+  description:
+    "Discover practical online tools for documents, productivity, and more. Start with the AI-powered Agentic Resume Builder.",
+  metadataBase: new URL("https://simple9999.com"),
 };
 
 export default function RootLayout({

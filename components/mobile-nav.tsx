@@ -7,10 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export function MobileNav() {
+export function MobileNav({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
     const [isOpen, setIsOpen] = useState(false);
 
-    // Prevent scrolling when menu is open
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = "hidden";
@@ -35,7 +34,6 @@ export function MobileNav() {
             <AnimatePresence>
                 {isOpen && (
                     <>
-                        {/* Backdrop */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -43,8 +41,6 @@ export function MobileNav() {
                             className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50"
                             onClick={() => setIsOpen(false)}
                         />
-
-                        {/* Menu Panel */}
                         <motion.div
                             initial={{ x: "100%" }}
                             animate={{ x: 0 }}
@@ -68,41 +64,14 @@ export function MobileNav() {
 
                             <div className="flex-1 overflow-y-auto py-6 px-6 flex flex-col gap-6">
                                 <nav className="flex flex-col space-y-4">
-                                    <Link
-                                        href="#features"
-                                        className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-                                        onClick={() => setIsOpen(false)}
-                                    >
-                                        Features
-                                    </Link>
-                                    <Link
-                                        href="/pricing"
-                                        className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-                                        onClick={() => setIsOpen(false)}
-                                    >
-                                        Pricing
-                                    </Link>
-                                    <Link
-                                        href="/developer"
-                                        className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-                                        onClick={() => setIsOpen(false)}
-                                    >
-                                        Developer
-                                    </Link>
-                                    <Link
-                                        href="/docs"
-                                        className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-                                        onClick={() => setIsOpen(false)}
-                                    >
-                                        Docs
-                                    </Link>
-                                    <Link
-                                        href="/login"
-                                        className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2"
-                                        onClick={() => setIsOpen(false)}
-                                    >
-                                        Log in
-                                    </Link>
+                                    <Link href="/" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Home</Link>
+                                    <Link href="/tools" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Explore Tools</Link>
+                                    <Link href="/tools" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Categories</Link>
+                                    {isAuthenticated ? (
+                                        <Link href="/dashboard" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Dashboard</Link>
+                                    ) : (
+                                        <Link href="/login" className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors py-2" onClick={() => setIsOpen(false)}>Sign in</Link>
+                                    )}
                                 </nav>
                             </div>
 
@@ -111,13 +80,15 @@ export function MobileNav() {
                                     <span className="text-sm font-medium text-muted-foreground">Theme</span>
                                     <ThemeToggle />
                                 </div>
-                                <Link
-                                    href="/signup"
-                                    onClick={() => setIsOpen(false)}
-                                    className="w-full py-3 rounded-full bg-primary text-primary-foreground text-center font-medium hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
-                                >
-                                    Get Started
-                                </Link>
+                                {!isAuthenticated && (
+                                    <Link
+                                        href="/signup"
+                                        onClick={() => setIsOpen(false)}
+                                        className="w-full py-3 rounded-full bg-primary text-primary-foreground text-center font-medium hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+                                    >
+                                        Get Started
+                                    </Link>
+                                )}
                             </div>
                         </motion.div>
                     </>

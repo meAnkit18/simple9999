@@ -1,17 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { Loader2 } from "lucide-react";
 
-export default function SignupPage() {
+function SignupPage() {
     const [form, setForm] = useState({ name: "", email: "", password: "" });
     const [loading, setLoading] = useState(false);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const [error, setError] = useState("");
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const rawNext = searchParams.get("next");
+    const nextUrl = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/dashboard";
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -28,7 +31,7 @@ export default function SignupPage() {
             const data = await res.json();
 
             if (res.ok) {
-                router.push("/login?registered=true");
+                router.push(`/login?registered=true&next=${encodeURIComponent(nextUrl)}`);
             } else {
                 setError(data.message || "Signup failed");
             }
@@ -119,7 +122,7 @@ export default function SignupPage() {
                         disabled={isGoogleLoading}
                         onClick={() => {
                             setIsGoogleLoading(true);
-                            import("next-auth/react").then(({ signIn }) => signIn("google", { callbackUrl: "/dashboard" }));
+                            import("next-auth/react").then(({ signIn }) => signIn("google", { callbackUrl: nextUrl }));
                         }}
                         className="w-full flex items-center justify-center gap-2 border border-input bg-background p-3 rounded hover:bg-accent hover:text-accent-foreground transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -158,4 +161,12 @@ export default function SignupPage() {
             </div>
         </div>
     );
+}
+
+export default function SignupPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+      <SignupPage />
+    </Suspense>
+  );
 }
