@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HomeDiscovery } from "@/components/HomeDiscovery";
-import { getPublicTools } from "@/lib/tools/registry";
 
 export const metadata: Metadata = {
   title: "Simple9999 — Free Online Tools for Everyday Work",
@@ -20,52 +18,10 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const tools = getPublicTools();
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       <main className="pt-20">
-        {/* Compact hero */}
-        <section className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
-              Free Online Tools for Everyday Work
-            </h1>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Discover practical tools for documents, productivity, and more. Start with our
-              AI-powered resume builder and explore new tools as they arrive.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/tools"
-                className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              >
-                Explore Tools
-              </Link>
-              <Link
-                href="/tools/agentic-resume-builder"
-                className="rounded-full border border-border px-6 py-3 text-sm font-medium hover:bg-accent"
-              >
-                Build Your Resume
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Platform intro */}
-        <section className="mx-auto max-w-6xl px-6 pb-8">
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <h2 className="text-xl font-semibold">A growing tools platform</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Simple9999 brings together focused, useful utilities. Each tool has its own page,
-              clear requirements, and a simple workflow. New tools are added as they become ready.
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Currently {tools.length} tool is available. More categories and tools are on the way.
-            </p>
-          </div>
-        </section>
-
         <HomeDiscovery />
 
         {/* How it works */}
